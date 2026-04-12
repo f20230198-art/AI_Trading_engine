@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+data/memory/
+data/performance.db
+data/doom.log
+.venv/
+venv/

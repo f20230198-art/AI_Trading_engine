@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DOOM ENGINE — War Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0b0b11;
+  --bg2:       #101018;
+  --bg3:       #16161f;
+  --bg4:       #1e1e28;
+  --border:    rgba(0,212,255,0.08);
+  --blue:      #00d4ff;
+  --blue-dim:  #a8e8ff;
+  --gold:      #ffb955;
+  --red:       #ff6060;
+  --green:     #00d4ff;
+  --text:      #e2dff0;
+  --text-dim:  #8a9aaa;
+  --text-faint:#3a4a55;
+}
+
+html, body, #root {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+/* ── TYPOGRAPHY ────────────────────────────────────────────────── */
+.sg { font-family: 'Space Grotesk', sans-serif; }
+.label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.label-bright { color: var(--blue-dim); }
+.label-gold   { color: var(--gold); }
+
+/* ── LAYOUT ────────────────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── TOASTS ───────────────────────────────────────────────────── */
+.toast-stack {
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  min-width: 240px;
+  max-width: 360px;
+  padding: 8px 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,212,255,0.2);
+  background: rgba(8,8,16,0.9);
+  color: var(--blue-dim);
+  animation: toast-in 0.18s ease-out both;
+}
+.toast-success {
+  border-color: rgba(0,212,255,0.35);
+  color: var(--blue);
+}
+.toast-warn {
+  border-color: rgba(255,185,85,0.35);
+  color: var(--gold);
+}
+.toast-error {
+  border-color: rgba(255,96,96,0.45);
+  color: var(--red);
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PARTICLE BG ───────────────────────────────────────────────── */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#scanline {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px
+  );
+}
+
+/* ── TOP BAR ───────────────────────────────────────────────────── */
+#topbar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(8,8,14,0.95);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--blue);
+  text-shadow: 0 0 14px rgba(0,212,255,0.7);
+  animation: logo-pulse 4s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { text-shadow: 0 0 10px rgba(0,212,255,0.6); }
+  50%      { text-shadow: 0 0 22px rgba(0,212,255,1), 0 0 40px rgba(0,212,255,0.3); }
+}
+
+/* ── TABS ──────────────────────────────────────────────────────── */
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  margin-left: 24px;
+}
+.tab-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0 16px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: rgba(168,232,255,0.28);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  position: relative;
+}
+.tab-btn:hover {
+  color: rgba(168,232,255,0.65);
+  background: rgba(0,212,255,0.04);
+}
+.tab-btn.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  background: rgba(0,212,255,0.07);
+  text-shadow: 0 0 6px rgba(0,212,255,0.4);
+}
+
+/* ── STATUS PILLS ─────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.pill-blue { background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.22); color: var(--blue-dim); }
+.pill-red  { background: rgba(255,96,96,0.07);  border: 1px solid rgba(255,96,96,0.22);  color: var(--red);  }
+.pill-gold { background: rgba(255,185,85,0.07); border: 1px solid rgba(255,185,85,0.22); color: var(--gold); }
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-blue  { background: var(--blue); }
+.dot-red   { background: var(--red);  }
+.dot-gold  { background: var(--gold); }
+.dot-pulse { animation: dot-blink 1.8s ease-in-out infinite; }
+@keyframes dot-blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+/* ── CLOCK ─────────────────────────────────────────────────────── */
+.clock {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: rgba(0,212,255,0.55);
+}
+
+/* ── MAIN CONTENT AREA ────────────────────────────────────────── */
+#content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── PANELS ────────────────────────────────────────────────────── */
+.panel {
+  background: rgba(16,16,24,0.75);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+.panel-inset {
+  background: rgba(10,10,16,0.6);
+  border: 1px solid rgba(0,212,255,0.05);
+}
+
+/* corner brackets */
+.panel::before, .panel::after,
+.panel > .corner-bl, .panel > .corner-br {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px;
+  border-color: rgba(0,212,255,0.3);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 5;
+}
+.panel::before { top:0; left:0;  border-width:1px 0 0 1px; }
+.panel::after  { top:0; right:0; border-width:1px 1px 0 0; }
+.panel > .corner-bl { bottom:0; left:0;  border-width:0 0 1px 1px; }
+.panel > .corner-br { bottom:0; right:0; border-width:0 1px 1px 0; }
+
+.panel-gold::before, .panel-gold::after,
+.panel-gold > .corner-bl, .panel-gold > .corner-br { border-color: rgba(255,185,85,0.3); }
+
+/* ── SECTION HEADER ───────────────────────────────────────────── */
+.sec-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.sec-header .line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,212,255,0.15), transparent);
+}
+.sec-header.gold .line { background: linear-gradient(90deg, rgba(255,185,85,0.2), transparent); }
+
+/* ── LEFT SIDEBAR ─────────────────────────────────────────────── */
+#sidebar-left {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(9,9,15,0.85);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 14px 12px;
+  gap: 14px;
+  position: relative;
+  z-index: 5;
+}
+
+/* ── AGENT NODE ───────────────────────────────────────────────── */
+.agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.agent-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px;
+  background: rgba(14,14,22,0.7);
+  border: 1px solid rgba(0,212,255,0.06);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.agent-node:hover { background: rgba(0,212,255,0.05); border-color: rgba(0,212,255,0.15); }
+.agent-icon-wrap {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,212,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 35%, rgba(0,212,255,0.08) 0%, transparent 70%);
+  position: relative;
+}
+.agent-icon-wrap.gold { border-color: rgba(255,185,85,0.35); }
+.agent-icon-wrap.red  { border-color: rgba(255,96,96,0.35); }
+.agent-ring-anim {
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,212,255,0.2);
+  animation: ring-expand 2.5s ease-out infinite;
+}
+.gold .agent-ring-anim  { border-color: rgba(255,185,85,0.25); }
+.red  .agent-ring-anim  { border-color: rgba(255,96,96,0.25); }
+@keyframes ring-expand {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  font-size: 16px;
+  color: var(--blue);
+}
+.material-symbols-outlined.gold { color: var(--gold); }
+.material-symbols-outlined.red  { color: var(--red); }
+.agent-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+.agent-status {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.status-active   { color: var(--blue); }
+.status-running  { color: var(--gold); }
+.status-error    { color: var(--red); }
+.status-offline  { color: var(--text-faint); }
+
+/* ── CENTER ───────────────────────────────────────────────────── */
+#center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 10px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── RIGHT SIDEBAR ────────────────────────────────────────────── */
+#sidebar-right {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(9,9,15,0.85);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 14px 12px;
+  gap: 12px;
+  position: relative;
+  z-index: 5;
+}
+
+/* ── EQUITY BIG NUMBER ────────────────────────────────────────── */
+.equity-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.equity-sub {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--blue);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ── METRIC CHIPS ─────────────────────────────────────────────── */
+.metric-row { display: flex; gap: 8px; }
+.metric-chip {
+  flex: 1;
+  background: rgba(14,14,22,0.8);
+  border: 1px solid rgba(0,212,255,0.07);
+  padding: 8px 10px;
+}
+.metric-chip .val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* ── CHART WRAPPER ────────────────────────────────────────────── */
+.chart-wrapper {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.chart-bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* ── HEATMAP ──────────────────────────────────────────────────── */
+.heatmap-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 3px;
+  height: 36px;
+}
+.heatmap-cell {
+  position: relative;
+  cursor: default;
+  transition: filter 0.15s;
+}
+.heatmap-cell:hover { filter: brightness(1.3); }
+.heatmap-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 6px;
+  text-align: center;
+  color: #fff;
+  background: rgba(0,0,0,0.55);
+  padding: 1px 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+  letter-spacing: 0.05em;
+}
+.heatmap-cell:hover .heatmap-label { opacity: 1; }
+
+/* ── TICKER ───────────────────────────────────────────────────── */
+.ticker-wrap {
+  overflow: hidden;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  background: rgba(6,6,12,0.9);
+  border-top: 1px solid rgba(0,212,255,0.06);
+  border-bottom: 1px solid rgba(0,212,255,0.06);
+}
+.ticker-inner {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  animation: ticker-scroll 35s linear infinite;
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.ticker-sym  { font-size: 9px;  font-weight: 700; color: var(--gold); letter-spacing: 0.1em; }
+.ticker-px   { font-size: 10px; color: var(--text); }
+.ticker-chg  { font-size: 9px; }
+.ticker-chg.up   { color: var(--blue); }
+.ticker-chg.down { color: var(--red); }
+.ticker-sep  { color: rgba(0,212,255,0.15); font-size: 9px; }
+
+/* ── BUTTONS ──────────────────────────────────────────────────── */
+.btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-strike {
+  background: linear-gradient(135deg, rgba(0,212,255,0.12), rgba(0,212,255,0.06));
+  border: 1px solid rgba(0,212,255,0.35);
+  color: var(--blue-dim);
+}
+.btn-strike:hover {
+  background: linear-gradient(135deg, rgba(0,212,255,0.22), rgba(0,212,255,0.1));
+  border-color: rgba(0,212,255,0.7);
+  color: var(--blue);
+  box-shadow: 0 0 18px rgba(0,212,255,0.25);
+}
+.btn-strike:active { transform: scale(0.97); }
+.btn-icon {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.15);
+  color: var(--text-dim);
+  padding: 9px 12px;
+}
+.btn-icon:hover { border-color: rgba(0,212,255,0.4); color: var(--blue); }
+
+/* ── RISK GAUGE ───────────────────────────────────────────────── */
+.gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+
+/* ── TRADE ROW ────────────────────────────────────────────────── */
+.trade-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(60,73,78,0.1);
+}
+.trade-row:last-child { border-bottom: none; }
+.trade-sym  { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; color: var(--text); }
+.trade-meta { font-family: 'Space Grotesk', sans-serif; font-size: 8px; color: var(--text-faint); letter-spacing: 0.06em; margin-top: 2px; }
+.trade-pnl  { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; }
+.trade-pnl.pos { color: var(--blue); }
+.trade-pnl.neg { color: var(--red); }
+.side-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  padding: 1px 6px;
+  letter-spacing: 0.1em;
+  margin-right: 5px;
+}
+.side-buy  { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25); color: var(--blue); }
+.side-sell { background: rgba(255,96,96,0.08); border: 1px solid rgba(255,96,96,0.25); color: var(--red); }
+
+/* ── POSITIONS ────────────────────────────────────────────────── */
+.pos-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(60,73,78,0.07);
+}
+
+/* ── CONFLICT ─────────────────────────────────────────────────── */
+.conflict-item {
+  background: rgba(255,185,85,0.04);
+  border: 1px solid rgba(255,185,85,0.1);
+  padding: 6px 8px;
+  margin-bottom: 5px;
+}
+
+/* ── SCROLLABLE ───────────────────────────────────────────────── */
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,212,255,0.15) transparent;
+}
+.scrollable::-webkit-scrollbar { width: 3px; }
+.scrollable::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.2); border-radius: 2px; }
+
+/* ── DOOM SPEAKS ──────────────────────────────────────────────── */
+.doom-speaks {
+  background: rgba(10,10,16,0.8);
+  border: 1px solid rgba(255,185,85,0.1);
+  border-left: 2px solid rgba(255,185,85,0.4);
+  padding: 8px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.doom-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  animation: fade-glow 3s ease-in-out infinite;
+}
+@keyframes fade-glow {
+  0%,100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+
+/* ── FOOTER ───────────────────────────────────────────────────── */
+#footer {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(5,5,10,0.97);
+  border-top: 1px solid rgba(255,185,85,0.1);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  overflow: hidden;
+}
+
+/* ── BOOT ANIMATION ───────────────────────────────────────────── */
+@keyframes boot {
+  from { opacity: 0; transform: translateY(6px); filter: blur(3px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+.boot { animation: boot 0.35s ease-out both; }
+.boot-d1 { animation-delay: 0.05s; }
+.boot-d2 { animation-delay: 0.12s; }
+.boot-d3 { animation-delay: 0.20s; }
+
+/* ── FULL-PAGE TAB PANELS ─────────────────────────────────────── */
+.tab-panel { display: flex; flex: 1; overflow: hidden; }
+
+/* ── ASSETS TAB ───────────────────────────────────────────────── */
+.asset-table { width: 100%; border-collapse: collapse; }
+.asset-table th {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(0,212,255,0.08);
+  font-weight: 600;
+  text-align: right;
+}
+.asset-table th:first-child { text-align: left; }
+.asset-table td {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(60,73,78,0.06);
+  text-align: right;
+  color: var(--text);
+}
+.asset-table td:first-child { text-align: left; font-weight: 700; }
+.asset-table tr:hover td { background: rgba(0,212,255,0.025); }
+
+/* ── TERMINAL TAB ─────────────────────────────────────────────── */
+.terminal {
+  background: rgba(4,4,8,0.95);
+  border: 1px solid rgba(0,212,255,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+}
+.terminal-bar {
+  padding: 7px 14px;
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(0,212,255,0.07);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.term-dot { width: 9px; height: 9px; border-radius: 50%; opacity: 0.65; }
+.terminal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.9;
+}
+.term-line { display: flex; gap: 14px; }
+.term-tag  { color: rgba(0,212,255,0.35); min-width: 52px; flex-shrink: 0; }
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-top: 1px solid rgba(0,212,255,0.07);
+  background: rgba(0,0,0,0.3);
+}
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--text);
+  caret-color: var(--blue);
+}
+
+@keyframes cursor-blink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+.cursor { animation: cursor-blink 1s step-end infinite; color: var(--blue); }
+
+/* ── ARCHIVE SCOREBOARD ───────────────────────────────────────── */
+.score-rank {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 24px;
+}
+.rank-1 { color: var(--gold); }
+.rank-2 { color: rgba(255,185,85,0.55); }
+.rank-3 { color: rgba(255,185,85,0.35); }
+.rank-n { color: var(--text-faint); }
+</style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<div id="scanline"></div>
+<div id="root"></div>
+
+<script>
+/* ── PARTICLE CANVAS ─────────────────────────────────────────── */
+(function(){
+  const c = document.getElementById('particle-canvas');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [], mx = -9999, my = -9999;
+  const GAP = 42, R = 80;
+
+  function init(){
+    W = c.width = innerWidth; H = c.height = innerHeight; pts = [];
+    for(let x=GAP/2;x<W;x+=GAP)
+      for(let y=GAP/2;y<H;y+=GAP)
+        pts.push({x,y,ox:x,oy:y,vx:0,vy:0});
+  }
+  window.addEventListener('resize', init);
+  window.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+  init();
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of pts){
+      const dx=p.x-mx, dy=p.y-my, d=Math.sqrt(dx*dx+dy*dy);
+      const f=Math.max(0,1-d/R);
+      const op=0.035 + f*0.45;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,0.9+f*1.2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,212,255,${op})`;
+      ctx.fill();
+      if(f>0){ p.vx+=(dx/d)*f*1.8; p.vy+=(dy/d)*f*1.8; }
+      p.vx+=(p.ox-p.x)*0.12; p.vy+=(p.oy-p.y)*0.12;
+      p.vx*=0.78; p.vy*=0.78;
+      p.x+=p.vx; p.y+=p.vy;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback} = React;
+
+/* ── WS HOOK ─────────────────────────────────────────────────── */
+function useWS(url){
+  const [st,setSt]=useState(null);
+  const [conn,setConn]=useState(false);
+  const ws=useRef(null), timer=useRef(null);
+  const connect=useCallback(()=>{
+    try{
+      const s=new WebSocket(url);
+      ws.current=s;
+      s.onopen=()=>setConn(true);
+      s.onmessage=e=>{ try{ const d=JSON.parse(e.data); if(d.type!=='heartbeat') setSt(p=>({...p,...d})); }catch(_){} };
+      s.onclose=()=>{ setConn(false); timer.current=setTimeout(connect,3000); };
+      s.onerror=()=>s.close();
+    }catch(_){ timer.current=setTimeout(connect,3000); }
+  },[url]);
+  useEffect(()=>{ connect(); return()=>{ ws.current?.close(); clearTimeout(timer.current); }; },[connect]);
+  return {st,conn};
+}
+function usePoll(url,ms=5000){
+  const [d,setD]=useState(null);
+  useEffect(()=>{
+    const go=async()=>{ try{ const r=await fetch(url); if(r.ok)setD(await r.json()); }catch(_){} };
+    go(); const t=setInterval(go,ms); return()=>clearInterval(t);
+  },[url,ms]);
+  return d;
+}
+
+/* ── CLOCK ───────────────────────────────────────────────────── */
+function Clock(){
+  const [t,setT]=useState(new Date());
+  useEffect(()=>{ const id=setInterval(()=>setT(new Date()),1000); return()=>clearInterval(id); },[]);
+  return <span className="clock">{t.toLocaleTimeString('en-US',{hour12:false,timeZone:'UTC'})} <span style={{opacity:0.4,fontSize:9}}>UTC</span></span>;
+}
+
+/* ── PULSE DOT ────────────────────────────────────────────────── */
+function Dot({color='#00d4ff'}){
+  return(
+    <span style={{position:'relative',display:'inline-flex',width:7,height:7,flexShrink:0}}>
+      <span style={{position:'absolute',inset:0,borderRadius:'50%',background:color,opacity:0.3,animation:'ring-expand 2s ease-out infinite'}}/>
+      <span style={{position:'absolute',inset:0,borderRadius:'50%',background:color}}/>
+    </span>
+  );
+}
+
+/* ── SECTION HEADER ──────────────────────────────────────────── */
+function SecHeader({label,icon,color='#00d4ff',gold}){
+  return(
+    <div className={`sec-header${gold?' gold':''}`} style={{marginBottom:10}}>
+      {icon&&<span className={`material-symbols-outlined${gold?' gold':''}`} style={{fontSize:13,color}}>{icon}</span>}
+      <span className="label" style={{color,letterSpacing:'0.16em'}}>{label}</span>
+      <div className="line"/>
+    </div>
+  );
+}
+
+/* ── AGENT NODE ──────────────────────────────────────────────── */
+function AgentNode({name,icon,status,variant='blue'}){
+  const isOn=['ACTIVE','NOMINAL','READY','RUNNING'].includes(status);
+  const clr = variant==='gold'?'gold':variant==='red'?'red':'';
+  return(
+    <div className="agent-node boot boot-d1">
+      <div className={`agent-icon-wrap ${clr}`}>
+        {isOn&&<div className="agent-ring-anim"/>}
+        <span className={`material-symbols-outlined ${clr}`}>{icon}</span>
+      </div>
+      <div className="agent-name">{name}</div>
+      <div className={`agent-status status-${isOn?variant==='gold'?'running':variant==='red'?'error':'active':'offline'}`}>
+        {status||'OFFLINE'}
+      </div>
+    </div>
+  );
+}
+
+/* ── EQUITY CHART ─────────────────────────────────────────────── */
+function EquityChart({curve=[],equity=100000}){
+  const ref=useRef(null), chart=useRef(null);
+  useEffect(()=>{
+    if(!ref.current)return;
+    chart.current?.destroy();
+    const ctx=ref.current.getContext('2d');
+    let labels,data;
+    if(curve.length>1){
+      labels=curve.map(p=>{ const d=new Date(p.timestamp); return d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); });
+      data=curve.map(p=>p.equity);
+    }else{
+      labels=['START','NOW'];
+      data=[equity||100000, equity||100000];
+    }
+    const grad=ctx.createLinearGradient(0,0,0,ref.current.height);
+    grad.addColorStop(0,'rgba(0,212,255,0.22)');
+    grad.addColorStop(0.7,'rgba(0,212,255,0.03)');
+    grad.addColorStop(1,'rgba(0,212,255,0)');
+    chart.current=new Chart(ctx,{
+      type:'line',
+      data:{ labels, datasets:[{
+        data, borderColor:'#00d4ff', borderWidth:1.5,
+        backgroundColor:grad, fill:true, tension:0.45,
+        pointRadius:0, pointHoverRadius:3, pointHoverBackgroundColor:'#00d4ff',
+      }]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{
+          backgroundColor:'rgba(8,8,16,0.95)',
+          borderColor:'rgba(0,212,255,0.25)',borderWidth:1,
+          titleColor:'#00d4ff',bodyColor:'#e2dff0',
+          titleFont:{family:'Space Grotesk',size:9},
+          bodyFont:{family:'Space Grotesk',size:11},
+          callbacks:{label:c=>`$${c.parsed.y.toLocaleString('en-US',{minimumFractionDigits:2})}`}
+        }},
+        scales:{
+          x:{display:false},
+          y:{display:true,position:'right',
+            grid:{color:'rgba(0,212,255,0.04)',drawBorder:false},
+            ticks:{color:'rgba(0,212,255,0.3)',font:{family:'Space Grotesk',size:8},
+              callback:v=>'$'+(v/1000).toFixed(0)+'K',maxTicksLimit:5}},
+        },
+        interaction:{intersect:false,mode:'index'},
+        animation:{duration:600,easing:'easeInOutQuart'},
+      }
+    });
+    return()=>{ chart.current?.destroy(); chart.current=null; };
+  },[curve,equity]);
+  return <canvas ref={ref} style={{width:'100%',height:'100%'}}/>;
+}
+
+/* ── ARC GAUGE ────────────────────────────────────────────────── */
+function ArcGauge({score=0,label='LOW'}){
+  const r=42,cx=60,cy=58;
+  const arc=Math.PI*r;
+  const filled=Math.min((score/100)*arc,arc);
+  const clr=score>75?'#ff6060':score>50?'#ffb955':score>25?'#ffb955':'#00d4ff';
+  return(
+    <div className="gauge-wrap">
+      <svg width="120" height="72" viewBox="0 0 120 72">
+        <path d={`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`}
+          fill="none" stroke="rgba(30,30,40,0.9)" strokeWidth="8" strokeLinecap="butt"/>
+        <path d={`M ${cx-r} ${cy} A ${r} ${r} 0 0 1 ${cx+r} ${cy}`}
+          fill="none" stroke={clr} strokeWidth="8" strokeLinecap="butt"
+          strokeDasharray={`${filled} ${arc}`}
+          style={{filter:`drop-shadow(0 0 5px ${clr})`,transition:'stroke-dasharray 1s ease'}}
+        />
+        {[0,25,50,75,100].map(p=>{
+          const a=Math.PI-(p/100)*Math.PI;
+          return <line key={p}
+            x1={cx+(r-10)*Math.cos(a)} y1={cy-(r-10)*Math.sin(a)}
+            x2={cx+(r- 5)*Math.cos(a)} y2={cy-(r- 5)*Math.sin(a)}
+            stroke="rgba(0,212,255,0.18)" strokeWidth="1"/>;
+        })}
+        <text x={cx} y={cy-5} textAnchor="middle" fill={clr} fontSize="13"
+          fontFamily="Space Grotesk" fontWeight="700"
+          style={{filter:`drop-shadow(0 0 4px ${clr})`}}>{label}</text>
+        <text x={cx} y={cy+10} textAnchor="middle" fill="rgba(187,201,207,0.4)"
+          fontSize="8" fontFamily="Space Grotesk">{score}/100</text>
+      </svg>
+      <div style={{display:'flex',gap:16,fontSize:7,fontFamily:'Space Grotesk',color:'rgba(187,201,207,0.3)',letterSpacing:'0.1em'}}>
+        <span>LOW</span><span>MOD</span><span>CRIT</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── HEATMAP ──────────────────────────────────────────────────── */
+function Heatmap({quotes={}}){
+  const syms=Object.keys(quotes).slice(0,12);
+  return(
+    <div className="heatmap-row">
+      {syms.map((s,i)=>{
+        const chg=quotes[s]?.change_pct||0;
+        const intensity=Math.min(Math.abs(chg)/3,1);
+        const bg=chg>=0?`rgba(0,212,255,${0.1+intensity*0.55})`:`rgba(255,96,96,${0.1+intensity*0.55})`;
+        return(
+          <div key={i} className="heatmap-cell" style={{background:bg}} title={`${s}: ${chg>0?'+':''}${chg.toFixed(2)}%`}>
+            <div className="heatmap-label">{s}</div>
+          </div>
+        );
+      })}
+      {Array.from({length:Math.max(0,12-syms.length)},(_,i)=>(
+        <div key={`e${i}`} className="heatmap-cell" style={{background:'rgba(0,212,255,0.03)'}}/>
+      ))}
+    </div>
+  );
+}
+
+/* ── TICKER ───────────────────────────────────────────────────── */
+function Ticker({quotes={}}){
+  const pairs=[...Object.entries(quotes),...Object.entries(quotes)];
+  return(
+    <div className="ticker-wrap">
+      <div className="ticker-inner">
+        {pairs.map(([sym,q],i)=>(
+          <span key={i} className="ticker-item">
+            <span className="ticker-sym">{sym}</span>
+            <span className="ticker-px">{(q.price||0).toFixed(2)}</span>
+            <span className={`ticker-chg ${(q.change_pct||0)>=0?'up':'down'}`}>
+              {(q.change_pct||0)>=0?'+':''}{(q.change_pct||0).toFixed(2)}%
+            </span>
+            <span className="ticker-sep">|</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── CONFLICT LOG ─────────────────────────────────────────────── */
+function ConflictLog({conflicts=[]}){
+  if(!conflicts.length)
+    return <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:'10px 0',fontFamily:'Space Grotesk'}}>No conflicts detected</div>;
+  return(
+    <div className="scrollable" style={{maxHeight:110}}>
+      {conflicts.slice(-4).reverse().map((c,i)=>(
+        <div key={i} className="conflict-item">
+          <div style={{display:'flex',alignItems:'center',gap:5,marginBottom:3}}>
+            <Dot color="#ffb955"/>
+            <span className="label label-gold">{c.agent_a_name||c.agent_a?.name} vs {c.agent_b_name||c.agent_b?.name}</span>
+          </div>
+          <div style={{fontSize:9,fontFamily:'Inter',color:'var(--text-dim)',lineHeight:1.5}}>
+            {c.agent_a_position||c.agent_a?.position} <span style={{color:'var(--red)'}}>vs</span> {c.agent_b_position||c.agent_b?.position}
+          </div>
+          <div style={{fontSize:9,fontFamily:'Space Grotesk',color:'var(--blue)',marginTop:3,letterSpacing:'0.05em'}}>
+            VERDICT: {c.verdict}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── ATTRIBUTION ──────────────────────────────────────────────── */
+function Attribution({attribution={}}){
+  const agents=Object.values(attribution?.by_agent||{});
+  if(!agents.length)
+    return <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:'8px 0',fontFamily:'Space Grotesk'}}>No closed trades</div>;
+  return(
+    <div className="scrollable" style={{maxHeight:120}}>
+      <table style={{width:'100%',borderCollapse:'collapse',fontSize:10}}>
+        <thead>
+          <tr style={{borderBottom:'1px solid rgba(0,212,255,0.08)'}}>
+            {['Agent','Trades','Win%','P&L'].map(h=>(
+              <th key={h} style={{fontFamily:'Space Grotesk',fontSize:8,color:'var(--text-faint)',
+                letterSpacing:'0.12em',textTransform:'uppercase',padding:'4px 2px',
+                textAlign:h==='Agent'?'left':'right',fontWeight:600}}>{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {agents.map((a,i)=>(
+            <tr key={i} style={{borderBottom:'1px solid rgba(60,73,78,0.06)'}}>
+              <td style={{fontFamily:'Inter',fontSize:10,color:'var(--text-dim)',padding:'5px 2px'}}>{a.agent}</td>
+              <td style={{fontFamily:'Space Grotesk',fontSize:10,color:'var(--text)',textAlign:'right'}}>{a.trades}</td>
+              <td style={{fontFamily:'Space Grotesk',fontSize:10,color:'var(--text)',textAlign:'right'}}>{a.win_rate}%</td>
+              <td style={{fontFamily:'Space Grotesk',fontSize:10,fontWeight:700,textAlign:'right',
+                color:(a.total_pnl||0)>=0?'var(--blue)':'var(--red)'}}>
+                ${(a.total_pnl||0).toFixed(0)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/* ── TACTICAL TAB (main 3-col) ───────────────────────────────── */
+function TacticalTab({
+  s,agents,metrics,regime,risk,doomSpeaks,conflicts,quotes,equityCurve,recentTrades,openTrades,livePositions,attribution,
+  controls,connected,onStrike,onPauseToggle,onEmergencyToggle,onManualOrder,controlBusy,
+}){
+  const equity=metrics.current_equity||100000;
+  const returnPct=metrics.return_pct||0;
+  const netPnl=metrics.equity_pnl ?? metrics.total_pnl ?? 0;
+  const realizedPnl=metrics.realized_pnl ?? metrics.total_pnl ?? 0;
+  const sectorCombinedStatus=agents.sectors?.status||'OFFLINE';
+  const isPaused=!!controls?.paused;
+  const isEmergency=!!controls?.emergency_stop;
+  const [manualSymbol,setManualSymbol]=useState('AAPL');
+  const [manualQty,setManualQty]=useState(1);
+  const displayedPositions=(livePositions&&livePositions.length)?livePositions:openTrades;
+
+  const agentNodes=[
+    {key:'market_intel',  name:'MARKET INTEL', icon:'query_stats',    v:'blue'},
+    {key:'risk_guardian', name:'RISK MGMT',    icon:'security',       v:'gold'},
+    {key:'execution',     name:'EXECUTION',    icon:'ads_click',      v:'blue'},
+    {key:'orchestrator',  name:'DOOM BRAIN',   icon:'psychology',     v:'blue'},
+    {key:'strategy',      name:'STRATEGY',     icon:'hub',            v:'blue'},
+    {key:'sentiment',     name:'SENTIMENT',    icon:'emergency',      v:'red'},
+  ];
+  const sectorNodes=[
+    {key:'sector_tech',       name:'TECH',       icon:'memory',          v:'blue'},
+    {key:'sector_energy',     name:'ENERGY',     icon:'bolt',            v:'gold'},
+    {key:'sector_financials', name:'FINANCIALS', icon:'account_balance', v:'blue'},
+  ];
+
+  return(
+    <div className="tab-panel">
+      {/* LEFT SIDEBAR */}
+      <div id="sidebar-left" className="boot boot-d1">
+        <SecHeader label="Strategic Ops" icon="precision_manufacturing"/>
+
+        <div style={{background:'rgba(14,14,22,0.7)',border:'1px solid rgba(0,212,255,0.07)',padding:'6px 8px',display:'flex',alignItems:'center',gap:7}}>
+          <Dot color={regime.color||'#00d4ff'}/>
+          <span className="label" style={{color:regime.color||'var(--blue-dim)',letterSpacing:'0.12em'}}>
+            REGIME: {regime.current||'DETECTING'}
+          </span>
+        </div>
+
+        <div className="agent-grid">
+          {agentNodes.map(n=>(
+            <AgentNode key={n.key} name={n.name} icon={n.icon} variant={n.v}
+              status={agents[n.key]?.status||'OFFLINE'}/>
+          ))}
+        </div>
+
+        <SecHeader label="Sector Intel" icon="corporate_fare" color="var(--gold)" gold/>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:5}}>
+          {sectorNodes.map(n=>(
+            <AgentNode key={n.key} name={n.name} icon={n.icon} variant={n.v}
+              status={agents[n.key]?.status||sectorCombinedStatus}/>
+          ))}
+        </div>
+
+        <div style={{marginTop:'auto'}}>
+          <SecHeader label="Conflict Log" icon="warning" color="var(--gold)" gold/>
+          <ConflictLog conflicts={conflicts}/>
+        </div>
+      </div>
+
+      {/* CENTER */}
+      <div id="center" className="boot boot-d2">
+        {/* Top row: equity + metrics */}
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',flexShrink:0}}>
+          <div>
+            <div className="equity-num">${equity.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+            <div className="equity-sub">
+              <span className="material-symbols-outlined" style={{fontSize:11,verticalAlign:'middle',marginRight:4}}>
+                {returnPct>=0?'trending_up':'trending_down'}
+              </span>
+              EQUITY CURVE &nbsp;// {returnPct>=0?'+':''}{returnPct.toFixed(2)}% 24H
+            </div>
+          </div>
+          <div className="metric-row" style={{flexShrink:0}}>
+            {[
+              {l:'SHARPE',  v:(metrics.sharpe_ratio||0).toFixed(2), c:'var(--text)'},
+              {l:'WIN RATE',v:`${(metrics.win_rate||0).toFixed(1)}%`, c:'var(--blue)'},
+              {l:'MAX DD',  v:`${(metrics.max_drawdown||0).toFixed(2)}%`, c:'var(--red)'},
+              {l:'CYCLE',   v:s.cycle_count||0, c:'var(--gold)'},
+            ].map(m=>(
+              <div key={m.l} className="metric-chip">
+                <div className="label">{m.l}</div>
+                <div className="val" style={{color:m.c,marginTop:4}}>{m.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Chart panel */}
+        <div className="panel" style={{flex:1,minHeight:0,display:'flex',flexDirection:'column',padding:'12px'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <div className="chart-bg-grid"/>
+          <div className="chart-wrapper" style={{flex:1}}>
+            <EquityChart curve={equityCurve} equity={equity}/>
+          </div>
+          <div style={{marginTop:8}}>
+            <div className="label" style={{marginBottom:5}}>SECTOR HEATMAP</div>
+            <Heatmap quotes={quotes}/>
+          </div>
+        </div>
+
+        {/* DOOM SPEAKS */}
+        <div className="doom-speaks" style={{flexShrink:0}}>
+          <Dot color="#ffb955"/>
+          <div>
+            <span className="label label-gold" style={{marginRight:6}}>DOOM SPEAKS //</span>
+            <span className="doom-text">{doomSpeaks.latest||'Initializing autonomous trading systems. Standing by for market open...'}</span>
+          </div>
+        </div>
+
+        {/* Ticker */}
+        <Ticker quotes={quotes}/>
+
+        {/* Action buttons */}
+        <div style={{display:'flex',gap:8,flexShrink:0}}>
+          <button
+            className="btn btn-strike"
+            style={{
+              flex:1,
+              opacity:(controlBusy||isEmergency||!connected)?0.6:1,
+              cursor:(controlBusy||isEmergency||!connected)?'not-allowed':'pointer',
+            }}
+            disabled={controlBusy||isEmergency||!connected}
+            onClick={onStrike}
+          >
+            {controlBusy?'PROCESSING...':'⚡ EXECUTE STRIKE'}
+          </button>
+          <button
+            className="btn btn-icon"
+            style={{
+              opacity:(controlBusy||isEmergency||!connected)?0.6:1,
+              cursor:(controlBusy||isEmergency||!connected)?'not-allowed':'pointer',
+            }}
+            disabled={controlBusy||isEmergency||!connected}
+            onClick={onPauseToggle}
+            title={isPaused?'Resume trading loop':'Pause trading loop'}
+          >
+            <span className="material-symbols-outlined" style={{fontSize:13,color:'inherit'}}>
+              {isPaused?'play_arrow':'pause'}
+            </span>
+          </button>
+          <button
+            className="btn btn-icon"
+            style={{
+              borderColor:isEmergency?'rgba(255,96,96,0.6)':'rgba(0,212,255,0.15)',
+              color:isEmergency?'var(--red)':'var(--text-dim)',
+              opacity:(controlBusy||!connected)?0.6:1,
+              cursor:(controlBusy||!connected)?'not-allowed':'pointer',
+            }}
+            disabled={controlBusy||!connected}
+            onClick={onEmergencyToggle}
+            title={isEmergency?'Clear emergency stop':'Engage emergency stop'}
+          >
+            <span className="material-symbols-outlined" style={{fontSize:13,color:'inherit'}}>
+              {isEmergency?'restart_alt':'emergency_stop'}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* RIGHT SIDEBAR */}
+      <div id="sidebar-right" className="boot boot-d3">
+        {/* P&L Card */}
+        <div className="panel" style={{padding:'12px',position:'relative',overflow:'hidden'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <div style={{position:'absolute',top:-16,right:-16,width:60,height:60,borderRadius:'50%',
+            background:'radial-gradient(circle,rgba(0,212,255,0.06),transparent 70%)'}}/>
+          <div className="label label-bright" style={{marginBottom:6}}>PORTFOLIO NET P&L</div>
+          <div style={{fontFamily:'Space Grotesk',fontSize:22,fontWeight:700,letterSpacing:'-0.01em',
+            color:netPnl>=0?'var(--text)':'var(--red)',
+            textShadow:netPnl>=0?'0 0 12px rgba(0,212,255,0.15)':'0 0 12px rgba(255,96,96,0.2)'}}>
+            {netPnl>=0?'+':''}${netPnl.toLocaleString('en-US',{minimumFractionDigits:2})}
+          </div>
+          <div style={{display:'flex',gap:12,marginTop:7}}>
+            <span className="label">TRADES: {metrics.total_trades||0}</span>
+            <span className="label">OPEN: {metrics.active_positions||0}</span>
+          </div>
+          <div className="trade-meta" style={{marginTop:4}}>
+            Realized: {realizedPnl>=0?'+':''}${Number(realizedPnl).toFixed(2)}
+          </div>
+        </div>
+
+        {/* Risk Gauge */}
+        <div className="panel panel-gold" style={{padding:'10px 12px'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="System Risk" icon="monitor_heart" color="var(--gold)" gold/>
+          <ArcGauge score={risk.score||0} label={risk.label||'LOW'}/>
+        </div>
+
+        {/* Manual Order */}
+        <div className="panel" style={{padding:'10px 12px'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Manual Order" icon="point_of_sale"/>
+          <div style={{display:'flex',gap:6,marginBottom:8}}>
+            <input
+              value={manualSymbol}
+              onChange={e=>setManualSymbol(e.target.value.toUpperCase())}
+              placeholder="SYMBOL"
+              style={{
+                width:'50%',
+                background:'rgba(8,8,14,0.75)',
+                border:'1px solid rgba(0,212,255,0.2)',
+                color:'var(--text)',
+                fontFamily:'Space Grotesk',
+                fontSize:10,
+                letterSpacing:'0.08em',
+                padding:'7px 8px',
+                outline:'none',
+              }}
+            />
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={manualQty}
+              onChange={e=>setManualQty(Math.max(1,parseInt(e.target.value)||1))}
+              placeholder="QTY"
+              style={{
+                width:'50%',
+                background:'rgba(8,8,14,0.75)',
+                border:'1px solid rgba(0,212,255,0.2)',
+                color:'var(--text)',
+                fontFamily:'Space Grotesk',
+                fontSize:10,
+                letterSpacing:'0.08em',
+                padding:'7px 8px',
+                outline:'none',
+              }}
+            />
+          </div>
+          <div style={{display:'flex',gap:6}}>
+            <button
+              className="btn btn-strike"
+              style={{
+                flex:1,
+                padding:'7px 8px',
+                opacity:(controlBusy||isEmergency||!connected)?0.6:1,
+                cursor:(controlBusy||isEmergency||!connected)?'not-allowed':'pointer',
+              }}
+              disabled={controlBusy||isEmergency||!connected}
+              onClick={()=>onManualOrder('BUY', manualSymbol, manualQty)}
+            >
+              BUY
+            </button>
+            <button
+              className="btn btn-icon"
+              style={{
+                flex:1,
+                padding:'7px 8px',
+                borderColor:'rgba(255,96,96,0.35)',
+                color:'var(--red)',
+                opacity:(controlBusy||isEmergency||!connected)?0.6:1,
+                cursor:(controlBusy||isEmergency||!connected)?'not-allowed':'pointer',
+              }}
+              disabled={controlBusy||isEmergency||!connected}
+              onClick={()=>onManualOrder('SELL', manualSymbol, manualQty)}
+            >
+              SELL
+            </button>
+          </div>
+          <div className="trade-meta" style={{marginTop:6}}>Paper-trading market order · fills at open</div>
+        </div>
+
+        {/* Open Positions */}
+        <div className="panel" style={{padding:'10px 12px',flex:1}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Open Positions" icon="candlestick_chart"/>
+          <div className="scrollable" style={{maxHeight:150}}>
+            {displayedPositions.length===0
+              ? <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:'10px 0',fontFamily:'Space Grotesk'}}>No open positions</div>
+              : displayedPositions.slice(0,6).map((t,i)=>{
+                const qtyNum=Number(t.qty??0);
+                const sideText=(t.side?String(t.side).toUpperCase():(qtyNum>=0?'LONG':'SHORT'));
+                const isBuy=sideText==='BUY'||sideText==='LONG';
+                const pnlNum=Number(t.unrealized_pl??t.pnl??0);
+                const mvNum=Number(t.market_value??0);
+                return (
+                  <div key={i} className="pos-row">
+                    <div>
+                      <div>
+                        <span className={`side-badge ${isBuy?'side-buy':'side-sell'}`}>{sideText}</span>
+                        <span className="trade-sym">{t.symbol}</span>
+                      </div>
+                      <div className="trade-meta">QTY: {Math.abs(qtyNum)||0} | MV: ${Math.abs(mvNum).toFixed(2)}</div>
+                    </div>
+                    <div className={`trade-pnl ${pnlNum>=0?'pos':'neg'}`}>
+                      {pnlNum>=0?'+':''}{pnlNum.toFixed(2)}
+                    </div>
+                  </div>
+                );
+              })
+            }
+          </div>
+        </div>
+
+        {/* Trade Feed */}
+        <div className="panel" style={{padding:'10px 12px'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Trade Feed" icon="swap_horiz"/>
+          <div className="scrollable" style={{maxHeight:130}}>
+            {recentTrades.length===0
+              ? <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:'10px 0',fontFamily:'Space Grotesk'}}>Awaiting first trade...</div>
+              : recentTrades.slice(-6).reverse().map((t,i)=>(
+                <div key={i} className="trade-row">
+                  <div>
+                    <div className="trade-sym">
+                      <span className={`side-badge ${(t.side||t.action||'').toLowerCase()==='buy'?'side-buy':'side-sell'}`}>
+                        {(t.side||t.action||'').toUpperCase()}
+                      </span>
+                      {t.symbol}
+                    </div>
+                    <div className="trade-meta">QTY: {t.qty} @ ${(t.entry_price||0).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div className={`trade-pnl ${(t.pnl||0)>=0?'pos':'neg'}`}>{(t.pnl||0)>=0?'+':''}{(t.pnl||0).toFixed(2)}</div>
+                    <div className="trade-meta" style={{textAlign:'right'}}>{t.status}</div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        {/* Attribution */}
+        <div className="panel" style={{padding:'10px 12px'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Performance" icon="leaderboard"/>
+          <Attribution attribution={attribution}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── ASSETS TAB ──────────────────────────────────────────────── */
+function AssetsTab({quotes,openTrades,recentTrades,attribution}){
+  const syms=Object.entries(quotes);
+  return(
+    <div className="tab-panel" style={{gap:12,padding:14}}>
+      {/* Market table */}
+      <div className="panel" style={{flex:2,display:'flex',flexDirection:'column',padding:'14px',overflow:'hidden'}}>
+        <div className="corner-bl"/><div className="corner-br"/>
+        <SecHeader label="Market Overview" icon="candlestick_chart"/>
+        <div className="scrollable" style={{flex:1}}>
+          <table className="asset-table">
+            <thead>
+              <tr>
+                <th>Symbol</th><th>Price</th><th>Chg %</th><th>Volume</th><th>Signal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {syms.length===0
+                ? <tr><td colSpan={5} style={{color:'var(--text-faint)',textAlign:'center',padding:24}}>No market data — start the backend</td></tr>
+                : syms.map(([sym,q],i)=>{
+                  const chg=q.change_pct||0;
+                  return(
+                    <tr key={i}>
+                      <td>{sym}</td>
+                      <td>{(q.price||0).toFixed(2)}</td>
+                      <td style={{color:chg>=0?'var(--blue)':'var(--red)',fontWeight:700}}>
+                        {chg>=0?'+':''}{chg.toFixed(2)}%
+                      </td>
+                      <td style={{color:'var(--text-faint)',fontSize:9}}>
+                        {Number.isFinite(q.volume) ? Number(q.volume).toLocaleString() : 'N/A'}
+                      </td>
+                      <td>
+                        <span style={{fontSize:8,padding:'2px 7px',letterSpacing:'0.1em',
+                          background:chg>=0?'rgba(0,212,255,0.07)':'rgba(255,96,96,0.07)',
+                          border:`1px solid ${chg>=0?'rgba(0,212,255,0.2)':'rgba(255,96,96,0.2)'}`,
+                          color:chg>=0?'var(--blue)':'var(--red)',fontFamily:'Space Grotesk'}}>
+                          {chg>=0?'BULL':'BEAR'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Right column */}
+      <div style={{flex:1,display:'flex',flexDirection:'column',gap:12,overflow:'hidden'}}>
+        <div className="panel" style={{padding:'14px',flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Performance Attribution" icon="leaderboard"/>
+          <div className="scrollable" style={{flex:1}}>
+            <Attribution attribution={attribution}/>
+          </div>
+        </div>
+        <div className="panel" style={{padding:'14px',flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}}>
+          <div className="corner-bl"/><div className="corner-br"/>
+          <SecHeader label="Recent Trades" icon="swap_horiz"/>
+          <div className="scrollable" style={{flex:1}}>
+            {recentTrades.length===0
+              ? <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:12,fontFamily:'Space Grotesk'}}>No trades yet</div>
+              : recentTrades.slice(-10).reverse().map((t,i)=>(
+                <div key={i} className="trade-row">
+                  <div>
+                    <div className="trade-sym">
+                      <span className={`side-badge ${(t.side||t.action||'').toLowerCase()==='buy'?'side-buy':'side-sell'}`}>
+                        {(t.side||t.action||'').toUpperCase()}
+                      </span>
+                      {t.symbol}
+                    </div>
+                    <div className="trade-meta">QTY: {t.qty} @ ${(t.entry_price||0).toFixed(2)}</div>
+                  </div>
+                  <div className={`trade-pnl ${(t.pnl||0)>=0?'pos':'neg'}`}>
+                    {(t.pnl||0)>=0?'+':''}{(t.pnl||0).toFixed(2)}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── TERMINAL TAB ─────────────────────────────────────────────── */
+function TerminalTab({s,doomSpeaks}){
+  const [lines,setLines]=useState([
+    {tag:'SYS', msg:'DOOM ENGINE v2.0 — SENTINEL INTELLIGENCE ONLINE', color:'#00d4ff'},
+    {tag:'SYS', msg:'Multi-agent autonomous trading framework initialized.', color:'#00d4ff'},
+    {tag:'INFO',msg:'All subsystems nominal. Awaiting market conditions.', color:'#bbc9cf'},
+  ]);
+  const [inp,setInp]=useState('');
+  const bottom=useRef(null);
+
+  useEffect(()=>{
+    if(doomSpeaks.latest) setLines(p=>[...p.slice(-80),{tag:'DOOM',msg:doomSpeaks.latest,color:'#ffb955'}]);
+  },[doomSpeaks.latest]);
+
+  useEffect(()=>{ bottom.current?.scrollIntoView({behavior:'smooth'}); },[lines]);
+
+  const run=e=>{ if(e.key!=='Enter')return; const cmd=inp.trim(); if(!cmd)return;
+    setLines(p=>[...p,{tag:'>',msg:cmd,color:'#e2dff0'},{tag:'SYS',msg:`Command queued: ${cmd}`,color:'#3a4a55'}]);
+    setInp(''); };
+
+  return(
+    <div className="tab-panel" style={{padding:14,flexDirection:'column'}}>
+      <div className="terminal">
+        <div className="terminal-bar">
+          <div className="term-dot" style={{background:'#ff6060'}}/>
+          <div className="term-dot" style={{background:'#ffb955'}}/>
+          <div className="term-dot" style={{background:'#00d4ff'}}/>
+          <span className="label" style={{marginLeft:8,color:'rgba(0,212,255,0.35)'}}>DOOM_ENGINE — TERMINAL v2.0</span>
+          <Dot color="#00d4ff"/>
+        </div>
+        <div className="terminal-body scrollable">
+          {lines.map((l,i)=>(
+            <div key={i} className="term-line">
+              <span className="term-tag">[{l.tag}]</span>
+              <span style={{color:l.color||'#bbc9cf'}}>{l.msg}</span>
+            </div>
+          ))}
+          <div ref={bottom}/>
+        </div>
+        <div className="terminal-input-row">
+          <span style={{color:'var(--blue)',fontFamily:'Courier New',fontSize:13}}>&gt;</span>
+          <input className="terminal-input" value={inp} onChange={e=>setInp(e.target.value)}
+            onKeyDown={run} placeholder="Enter command..." autoFocus/>
+          <span className="cursor" style={{fontFamily:'Courier New',fontSize:14,color:'var(--blue)'}}>█</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── ARCHIVE TAB ──────────────────────────────────────────────── */
+function ArchiveTab({recentTrades,attribution}){
+  const agents=Object.values(attribution?.by_agent||{}).sort((a,b)=>(b.total_pnl||0)-(a.total_pnl||0));
+  return(
+    <div className="tab-panel" style={{gap:12,padding:14}}>
+      {/* Trade history */}
+      <div className="panel" style={{flex:2,display:'flex',flexDirection:'column',padding:'14px',overflow:'hidden'}}>
+        <div className="corner-bl"/><div className="corner-br"/>
+        <SecHeader label="Trade History" icon="history"/>
+        <div className="scrollable" style={{flex:1}}>
+          {recentTrades.length===0
+            ? <div style={{fontSize:11,color:'var(--text-faint)',textAlign:'center',padding:32,fontFamily:'Space Grotesk'}}>No trade history available.</div>
+            : [...recentTrades].reverse().map((t,i)=>(
+              <div key={i} className="trade-row">
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                  <span className={`side-badge ${(t.side||'').toLowerCase()==='buy'?'side-buy':'side-sell'}`}>
+                    {(t.side||t.action||'').toUpperCase()}
+                  </span>
+                  <div>
+                    <div className="trade-sym">{t.symbol}</div>
+                    <div className="trade-meta">QTY: {t.qty} @ ${(t.entry_price||0).toFixed(2)}</div>
+                  </div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div className={`trade-pnl ${(t.pnl||0)>=0?'pos':'neg'}`}>{(t.pnl||0)>=0?'+':''}{(t.pnl||0).toFixed(2)}</div>
+                  <div className="trade-meta">{t.status}</div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {/* Scoreboard */}
+      <div className="panel" style={{flex:1,display:'flex',flexDirection:'column',padding:'14px',overflow:'hidden'}}>
+        <div className="corner-bl"/><div className="corner-br"/>
+        <SecHeader label="Agent Scoreboard" icon="emoji_events" color="var(--gold)" gold/>
+        <div className="scrollable" style={{flex:1}}>
+          {agents.length===0
+            ? <div style={{fontSize:9,color:'var(--text-faint)',textAlign:'center',padding:16,fontFamily:'Space Grotesk'}}>No data yet</div>
+            : agents.map((a,i)=>(
+              <div key={i} className="trade-row">
+                <div style={{display:'flex',alignItems:'center',gap:10}}>
+                  <span className={`score-rank rank-${i<3?i+1:'n'}`}>#{i+1}</span>
+                  <div>
+                    <div className="trade-sym">{a.agent}</div>
+                    <div className="trade-meta">{a.trades} trades · {a.win_rate}% WR</div>
+                  </div>
+                </div>
+                <div className={`trade-pnl ${(a.total_pnl||0)>=0?'pos':'neg'}`}>
+                  {(a.total_pnl||0)>=0?'+':''}${(a.total_pnl||0).toFixed(0)}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── APP ──────────────────────────────────────────────────────── */
+function App(){
+  // Use the same port the page was served from — works for any port
+  const apiPort = window.location.port || '8001';
+  const apiBase=`http://${window.location.hostname}:${apiPort}`;
+  const wsUrl=`ws://${window.location.hostname}:${apiPort}/ws`;
+  const {st,conn}=useWS(wsUrl);
+  const rest=usePoll(`${apiBase}/api/state`,5000);
+  const s=st||rest||{};
+
+  const [tab,setTab]=useState('TACTICAL');
+  const [controlBusy,setControlBusy]=useState(false);
+  const [toasts,setToasts]=useState([]);
+
+  const pushToast=useCallback((text,kind='success')=>{
+    const id=`${Date.now()}-${Math.random()}`;
+    setToasts(prev=>[...prev.slice(-2),{id,text,kind}]);
+    setTimeout(()=>{
+      setToasts(prev=>prev.filter(t=>t.id!==id));
+    },2800);
+  },[]);
+
+  const controls    =s.controls      ||{};
+
+  const callControl=useCallback(async(path)=>{
+    setControlBusy(true);
+    try{
+      const resp=await fetch(`${apiBase}${path}`,{method:'POST'});
+      const payload=await resp.json().catch(()=>({}));
+      if(!resp.ok){
+        console.error('Control command failed', resp.status, payload);
+        pushToast(`Command failed (${resp.status})`, 'error');
+        return;
+      }
+      if(payload.ok===false){
+        console.warn(payload.message||'Control command rejected');
+        pushToast(payload.message||'Command rejected', 'warn');
+      }else{
+        pushToast(payload.message||'Command accepted', 'success');
+      }
+    }catch(err){
+      console.error('Control command failed', err);
+      pushToast('Network error while sending command', 'error');
+    }finally{
+      setControlBusy(false);
+    }
+  },[apiBase,pushToast]);
+
+  const handleStrike=useCallback(()=>{
+    callControl('/api/control/strike');
+  },[callControl]);
+
+  const handlePauseToggle=useCallback(()=>{
+    callControl(controls.paused?'/api/control/resume':'/api/control/pause');
+  },[callControl,controls.paused]);
+
+  const handleEmergencyToggle=useCallback(()=>{
+    callControl(
+      controls.emergency_stop
+        ? '/api/control/clear-emergency-stop'
+        : '/api/control/emergency-stop'
+    );
+  },[callControl,controls.emergency_stop]);
+
+  const submitManualOrder=useCallback(async(side,symbol,qty)=>{
+    const normalizedSymbol=String(symbol||'').trim().toUpperCase();
+    const normalizedQty=Math.max(1, Math.floor(Number(qty)||0));
+
+    if(!normalizedSymbol){
+      pushToast('Enter a symbol', 'warn');
+      return;
+    }
+    if(!Number.isFinite(normalizedQty) || normalizedQty < 1){
+      pushToast('Quantity must be at least 1', 'warn');
+      return;
+    }
+
+    setControlBusy(true);
+    try{
+      const resp=await fetch(`${apiBase}/api/control/manual-order`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({symbol:normalizedSymbol, side, qty:normalizedQty}),
+      });
+      const payload=await resp.json().catch(()=>({}));
+      if(!resp.ok){
+        pushToast(`Order failed (${resp.status})`, 'error');
+        return;
+      }
+      if(payload.ok===false){
+        pushToast(payload.message||'Order rejected', 'warn');
+      }else{
+        pushToast(payload.message||'Order submitted', 'success');
+      }
+    }catch(err){
+      console.error('Manual order failed', err);
+      pushToast('Network error while submitting order', 'error');
+    }finally{
+      setControlBusy(false);
+    }
+  },[apiBase,pushToast]);
+
+  const agents      =s.agents        ||{};
+  const metrics     =s.metrics       ||{};
+  const regime      =s.regime        ||{};
+  const risk        =s.risk          ||{};
+  const doomSpeaks  =s.doom_speaks   ||{};
+  const conflicts   =s.conflicts     ||[];
+  const quotes      =s.market_quotes ||{};
+  const equityCurve =s.equity_curve  ||[];
+  const recentTrades=s.recent_trades ||[];
+  const openTrades  =s.open_trades   ||[];
+  const livePositions=s.live_positions||[];
+  const attribution =s.attribution   ||{};
+
+  const tabs=['TACTICAL','ASSETS','TERMINAL','ARCHIVE'];
+
+  return(
+    <div id="app">
+      <div className="toast-stack">
+        {toasts.map(t=>(
+          <div key={t.id} className={`toast toast-${t.kind}`}>
+            {t.text}
+          </div>
+        ))}
+      </div>
+
+      {/* TOP BAR */}
+      <div id="topbar">
+        <div style={{display:'flex',alignItems:'center'}}>
+          <div className="logo">DOOM ENGINE</div>
+          <nav className="tab-nav">
+            {tabs.map(t=>(
+              <button key={t} className={`tab-btn${tab===t?' active':''}`} onClick={()=>setTab(t)}>{t}</button>
+            ))}
+          </nav>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div className={`pill ${conn?'pill-blue':'pill-red'}`}>
+            <div className={`dot ${conn?'dot-blue':'dot-red'} dot-pulse`}/>
+            {conn?(s.system_status||'ACTIVE'):'OFFLINE'}
+          </div>
+          <div className="pill pill-gold" style={{padding:'3px 8px'}}>
+            <div className="dot dot-gold dot-pulse"/>
+            {regime.current||'DETECTING'}
+          </div>
+          <Clock/>
+          <div style={{display:'flex',gap:6,marginLeft:4}}>
+            {['settings','power_settings_new'].map(ic=>(
+              <span key={ic} className="material-symbols-outlined" style={{fontSize:17,color:'rgba(168,232,255,0.3)',cursor:'pointer'}}
+                onMouseEnter={e=>e.target.style.color='#00d4ff'}
+                onMouseLeave={e=>e.target.style.color='rgba(168,232,255,0.3)'}
+              >{ic}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div id="content">
+        {tab==='TACTICAL' && (
+          <TacticalTab s={s} agents={agents} metrics={metrics} regime={regime} risk={risk}
+            doomSpeaks={doomSpeaks} conflicts={conflicts} quotes={quotes}
+            equityCurve={equityCurve} recentTrades={recentTrades} openTrades={openTrades}
+            livePositions={livePositions}
+            attribution={attribution} controls={controls} connected={conn}
+            onStrike={handleStrike} onPauseToggle={handlePauseToggle}
+            onEmergencyToggle={handleEmergencyToggle} onManualOrder={submitManualOrder}
+            controlBusy={controlBusy}/>
+        )}
+        {tab==='ASSETS'   && <AssetsTab   quotes={quotes} openTrades={openTrades} recentTrades={recentTrades} attribution={attribution}/>}
+        {tab==='TERMINAL' && <TerminalTab s={s} doomSpeaks={doomSpeaks}/>}
+        {tab==='ARCHIVE'  && <ArchiveTab  recentTrades={recentTrades} attribution={attribution}/>}
+      </div>
+
+      {/* FOOTER */}
+      <div id="footer">
+        <div style={{display:'flex',alignItems:'center',gap:10,overflow:'hidden',flex:1}}>
+          <div className="pill pill-gold" style={{flexShrink:0,padding:'2px 8px'}}>
+            <div className="dot dot-gold dot-pulse"/>
+            <span style={{fontSize:8}}>FEED</span>
+          </div>
+          <Ticker quotes={quotes}/>
+        </div>
+        <div className="label label-gold" style={{flexShrink:0,marginLeft:16}}>
+          DOOM ENGINE // SENTINEL INTELLIGENCE
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
