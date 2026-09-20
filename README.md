@@ -16,6 +16,37 @@ A fully autonomous trading system where 9+ specialized AI agents collaborate in 
 
 ---
 
+## Measured Performance
+
+Backtested over 5 years of real market data (2021-09 → 2026-09) with transaction
+costs applied. Reproduce with `python run_backtest.py --period 5y`.
+
+| Metric | Strategy | SPY Buy & Hold |
+|---|---:|---:|
+| Total return | 43.98% | 78.53% |
+| **Sharpe ratio** | **1.98** | 0.79 |
+| **Max drawdown** | **3.52%** | 24.43% |
+| Trades | 488 | 1 |
+| Win rate | 50.8% | — |
+
+**2.5× the risk-adjusted return of the S&P 500 at roughly one-seventh the
+drawdown**, while trailing on absolute return — a low-volatility,
+capital-preserving profile rather than an index-beating one.
+
+**Validated out-of-sample.** Parameters were tuned on the most recent 2 years;
+the earlier 3 years were held out entirely. Sharpe degrades from 2.21 to 1.74 —
+a mild decline, not the collapse that overfitting produces.
+
+Costs modeled: $0.005/share commission, 5bps slippage against every fill. No
+look-ahead bias — signals use data through bar *i*, orders fill at bar *i+1*'s
+open, and that guarantee is enforced by a test verified to fail when look-ahead
+is deliberately injected.
+
+See [results/RESULTS.md](results/RESULTS.md) for the full methodology, per-strategy
+breakdown, and a plain statement of the limitations.
+
+---
+
 ## Architecture
 
 ```
