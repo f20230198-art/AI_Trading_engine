@@ -56,29 +56,36 @@ pip install -r requirements.txt
 ```
 
 ### 3. Set environment variables
+
+Copy `.env.example` to `.env` and fill in your keys:
+
 ```bash
-# Recommended (free tier): Gemini
-export LLM_PROVIDER="gemini"
-export GEMINI_API_KEY="AIza..."
-export LLM_MODEL="gemini-2.5-flash"
+# Recommended (free tier): Groq
+LLM_PROVIDER=groq
+GROQ_API_KEY_1=gsk_...
+LLM_MODEL=llama-3.3-70b-versatile
 
-# Optional alternative: Anthropic
-# export LLM_PROVIDER="anthropic"
-# export ANTHROPIC_API_KEY="sk-ant-..."
+# Required for real market data and trading (paper mode)
+ALPACA_API_KEY=PK...
+ALPACA_SECRET_KEY=...
 
-# Required for real market data and trading
-export ALPACA_API_KEY="PK..."
-export ALPACA_SECRET_KEY="..."
-
-# Optional — enhances sentiment scanning
-export NEWS_API_KEY="..."
+API_PORT=8000
 ```
 
+The LLM backend is resolved automatically in priority order — **Ollama → Groq →
+Gemini → Anthropic → quant**. Ollama is used whenever it is running locally, no
+config needed. If no backend is available the deterministic quant fallback
+activates, which computes signals from live market data with no LLM at all.
+
+Additional Groq keys (`GROQ_API_KEY_2`, `_3`) are rotated automatically when one
+hits its rate limit.
+
 **Get your API keys:**
-- Google AI Studio (free Gemini key): https://aistudio.google.com/apikey
-- Anthropic (optional): https://console.anthropic.com/
+- Groq (free, fast): https://console.groq.com
 - Alpaca (free paper trading): https://app.alpaca.markets/signup
-- NewsAPI (free tier): https://newsapi.org/register
+- Google AI Studio (optional Gemini fallback): https://aistudio.google.com/apikey
+- Anthropic (optional): https://console.anthropic.com/
+- NewsAPI (optional, enhances sentiment): https://newsapi.org/register
 
 ### 4. Run
 ```bash
@@ -86,7 +93,14 @@ python main.py
 ```
 
 ### 5. Open the dashboard
-Navigate to **http://localhost:8000** in your browser.
+Navigate to **http://localhost:8000** in your browser (or whatever `API_PORT` you
+set — pick a free port if 8000 is taken on your machine).
+
+### 6. Run the tests
+```bash
+python -m pytest tests -q
+```
+All tests are offline — no network, no API keys required.
 
 ---
 
@@ -130,7 +144,20 @@ Receives signals from all intel agents and runs 3 sub-strategies simultaneously:
 Uses the configured LLM to weigh strategies against current regime and generate ranked trade proposals with sizing.
 
 ### Risk Guardian
-Reviews every trade proposal before execution. Enforces hard rules (5% max position, 20% sector limit, 3% daily drawdown). Makes its own LLM call to reason about portfolio-level risk. Can VETO or RESIZE any trade.
+Reviews every trade proposal before execution. Makes its own LLM call to reason about
+portfolio-level risk, then enforces the hard rules **in code** rather than relying on the
+model to apply them: 5% max position, 20% sector concentration, and a 3% daily drawdown
+limit that vetoes all new trades when breached.
+
+Vetoes are enforced in the execution path, not merely advised. In CRISIS regime a veto is
+absolute; in other regimes the Orchestrator can override one only by setting an explicit
+flag with conviction above 0.85.
+
+### Position Sizing
+Share quantities are computed deterministically from portfolio equity, live price, and
+`position_size_pct` — never taken from an LLM response. When price or equity is unknown
+the trade is skipped and logged rather than sized nominally, since a position that cannot
+be measured cannot be shown to respect the 5% cap.
 
 ### Portfolio Rebalancing Agent
 Runs every 30 cycles. Reviews current holdings vs target allocations. Generates rebalance orders if drift exceeds 5% threshold.
@@ -183,7 +210,7 @@ After each closed trade, P&L is attributed to the originating agent and strategy
 
 | Layer | Technology |
 |-------|-----------|
-| LLM | Gemini 2.5 Flash (default) via Google AI Studio API, or Anthropic (optional) |
+| LLM | Groq llama-3.3-70b (default), with Ollama / Gemini / Anthropic / quant fallback |
 | Agent Framework | Custom async Python with BaseAgent class |
 | Market Data | Alpaca Markets API + yfinance fallback |
 | Execution | Alpaca Paper Trading API |
@@ -219,7 +246,9 @@ doom-engine/
 │   ├── memory_store.py        # ChromaDB vector memory
 │   ├── conflict_logger.py     # Agent conflict audit trail
 │   ├── performance_tracker.py # P&L attribution + metrics
+│   ├── position_sizer.py      # Deterministic sizing + veto enforcement
 │   └── shared_state.py        # Central state + WebSocket broadcast
+├── tests/                     # Offline regression tests (pytest)
 ├── backend/
 │   └── api.py                 # FastAPI + WebSocket server
 ├── frontend/
