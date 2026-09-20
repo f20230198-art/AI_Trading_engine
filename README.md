@@ -123,6 +123,13 @@ hits its rate limit.
 python main.py
 ```
 
+**No keys? It still runs.** Quotes fall back to yfinance and the agents fall back
+to deterministic quant mode, so the full pipeline — live prices, news, signals,
+risk review, veto enforcement, position sizing — is fully observable on the
+dashboard with nothing configured. Only order placement requires Alpaca
+credentials; without them the Execution agent reports the approved trades and
+holds.
+
 ### 5. Open the dashboard
 Navigate to **http://localhost:8000** in your browser (or whatever `API_PORT` you
 set — pick a free port if 8000 is taken on your machine).
@@ -139,8 +146,8 @@ All tests are offline — no network, no API keys required.
 
 | Component | Status | Requires |
 |-----------|--------|----------|
-| All 9 Agent LLM Reasoning | Real Gemini/Anthropic API calls | `LLM_PROVIDER` + (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`) |
-| Market Data (real-time quotes) | Real Alpaca API | `ALPACA_API_KEY` |
+| All Agent LLM Reasoning | Real Groq/Gemini/Anthropic/Ollama calls | any one LLM key, else quant fallback |
+| Market Data (real-time quotes) | Alpaca, falls back to yfinance | none (yfinance needs no key) |
 | Historical Price Data | Alpaca + yfinance fallback | `ALPACA_API_KEY` (yfinance works without) |
 | Paper Trading (order execution) | Real Alpaca Paper API | `ALPACA_API_KEY` + `ALPACA_SECRET_KEY` |
 | News/Sentiment (Alpaca News) | Real API | `ALPACA_API_KEY` |
