@@ -61,10 +61,28 @@ class ExecutionAgent(BaseAgent):
                 return {"agent": self.name, "executed": [], "failed": []}
 
             if not ALPACA_API_KEY:
-                raise RuntimeError(
-                    "ALPACA_API_KEY not set. Cannot place trades. "
-                    "The Execution Agent requires real Alpaca Paper Trading API access."
+                # Not an error condition. Everything upstream — signals, risk
+                # review, veto enforcement, sizing — has run and is observable;
+                # only order placement needs a broker. Report and skip rather
+                # than raising, so a keyless demo shows a clean cycle.
+                logger.info(
+                    f"No Alpaca credentials — {len(approved_trades)} approved "
+                    "trade(s) not placed. Set ALPACA_API_KEY to enable execution."
                 )
+                await self.update_status(
+                    "ADVISORY", f"{len(approved_trades)} trades pending broker credentials"
+                )
+                await shared_state.add_agent_message(
+                    self.name, "orchestrator", "EXECUTION_SKIPPED",
+                    f"{len(approved_trades)} trades ready but no broker configured",
+                )
+                return {
+                    "agent": self.name,
+                    "executed": [],
+                    "failed": [],
+                    "skipped": approved_trades,
+                    "reason": "no_broker_credentials",
+                }
 
             executed = []
             failed = []

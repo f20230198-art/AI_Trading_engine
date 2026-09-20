@@ -48,13 +48,18 @@ class MarketDataFeed:
     # Real-time quotes via Alpaca
     # ------------------------------------------------------------------
     async def get_latest_quotes(self, symbols: Optional[List[str]] = None) -> Dict[str, Dict]:
-        """Fetch latest quotes for symbols from Alpaca."""
+        """
+        Fetch latest quotes, preferring Alpaca and falling back to yfinance.
+
+        Without a fallback the whole engine is unusable with no Alpaca key —
+        market_intel and the sector agents fail every cycle and nothing can be
+        demonstrated. yfinance needs no key, so the system stays fully
+        observable; only order execution actually requires Alpaca.
+        """
         symbols = symbols or WATCHLIST_ALL
         if not ALPACA_API_KEY:
-            raise RuntimeError(
-                "ALPACA_API_KEY not set. Cannot fetch market data. "
-                "Set environment variable and restart."
-            )
+            logger.info("No Alpaca key — using yfinance for quotes")
+            return await self._yfinance_quotes(symbols)
 
         url = f"{ALPACA_DATA_URL}/v2/stocks/snapshots"
         params = {"symbols": ",".join(symbols), "feed": "iex"}
@@ -94,11 +99,74 @@ class MarketDataFeed:
             return quotes
 
         except httpx.HTTPStatusError as e:
-            logger.error(f"Alpaca API error: {e.response.status_code} — {e.response.text}")
-            raise RuntimeError(f"Alpaca API returned {e.response.status_code}: {e.response.text}")
+            logger.warning(
+                f"Alpaca quotes failed ({e.response.status_code}), falling back to yfinance"
+            )
+            return await self._yfinance_quotes(symbols)
         except Exception as e:
-            logger.error(f"Failed to fetch quotes: {e}")
-            raise
+            logger.warning(f"Alpaca quotes failed ({e}), falling back to yfinance")
+            return await self._yfinance_quotes(symbols)
+
+    async def _yfinance_quotes(self, symbols: List[str]) -> Dict[str, Dict]:
+        """
+        Quote snapshots from yfinance, shaped exactly like the Alpaca path.
+
+        Uses 2 days of daily bars so change_pct can be computed against the
+        prior close. Runs in a thread since yfinance is synchronous.
+        """
+        import yfinance as yf
+
+        def _fetch() -> Dict[str, Dict]:
+            data = yf.download(
+                symbols, period="2d", progress=False,
+                auto_adjust=True, group_by="ticker",
+            )
+            if data.empty:
+                return {}
+
+            quotes: Dict[str, Dict] = {}
+            for symbol in symbols:
+                try:
+                    df = data[symbol] if len(symbols) > 1 else data
+                    df = df.dropna()
+                    if df.empty:
+                        continue
+                    last = df.iloc[-1]
+                    prev_close = float(df.iloc[-2]["Close"]) if len(df) > 1 else float(last["Close"])
+                    price = float(last["Close"])
+                    change_pct = ((price - prev_close) / prev_close * 100) if prev_close else 0.0
+                    high, low = float(last["High"]), float(last["Low"])
+                    quotes[symbol] = {
+                        "symbol": symbol,
+                        "price": price,
+                        "bid": price,
+                        "ask": price,
+                        "volume": float(last["Volume"]),
+                        "high": high,
+                        "low": low,
+                        "open": float(last["Open"]),
+                        "prev_close": prev_close,
+                        "change_pct": round(change_pct, 2),
+                        "timestamp": str(df.index[-1]),
+                        # No true VWAP in daily bars; the typical price is the
+                        # standard proxy and is what the momentum check needs.
+                        "vwap": round((high + low + price) / 3, 4),
+                        "source": "yfinance",
+                    }
+                except (KeyError, IndexError, ValueError):
+                    continue
+            return quotes
+
+        loop = asyncio.get_event_loop()
+        quotes = await loop.run_in_executor(None, _fetch)
+        if not quotes:
+            raise RuntimeError(
+                f"No quote data for {len(symbols)} symbols from Alpaca or yfinance. "
+                "Check your network connection."
+            )
+        self._price_cache.update(quotes)
+        logger.info(f"Fetched {len(quotes)} quotes from yfinance")
+        return quotes
 
     async def get_latest_price(self, symbol: str) -> float:
         """Get latest price for a single symbol."""

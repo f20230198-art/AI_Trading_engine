@@ -240,7 +240,16 @@ class DoomEngine:
                         positions_value=positions_value,
                     )
                 else:
+                    # No broker connected. Fall back to the tracked paper book so
+                    # the full pipeline — sizing, risk limits, veto enforcement —
+                    # stays observable in a keyless demo. Orders are still never
+                    # placed; the Execution agent requires real Alpaca credentials.
                     context["positions"] = []
+                    metrics = performance_tracker.get_dashboard_metrics()
+                    context["equity"] = metrics.get(
+                        "current_equity", TRADING_CONFIG.initial_capital
+                    )
+                    context["simulated_equity"] = True
                     await shared_state.update_live_positions([])
             except Exception as e:
                 logger.warning(f"Could not fetch positions: {e}")
