@@ -78,10 +78,44 @@ real desk would accept. Disable with `cash_yield_annual=0.0`.
 | Mean reversion | 211 | 45.0% | $6,281 |
 | Momentum | 23 | 34.8% | −$167 |
 
-Mean reversion carries the performance. Momentum fires rarely (23 trades in 2
-years) and is roughly break-even — it requires a fresh EMA crossover with volume
-confirmation and RSI below 70, which is a demanding filter. Worth either relaxing
-or removing on the evidence here.
+Mean reversion carries the performance. Momentum fires rarely and is roughly
+break-even.
+
+### Investigating momentum
+
+The momentum signal contains a design flaw: it requires a *fresh* EMA crossover —
+the moment where fast and slow EMAs are by definition nearly equal — and then
+derives conviction from `spread × 50`, where `spread` is the gap between them.
+At a fresh crossover that gap is ~0, so the strength score is always tiny.
+**314 of 474 detected crossovers were discarded by a weakness test that the entry
+condition itself guarantees will fail.**
+
+Three fixes were tested and measured out-of-sample:
+
+| Variant | OOS Sharpe | OOS momentum win rate | Verdict |
+|---|---:|---:|---|
+| Current (`spread × 50`) | 1.74 | 52.6% | baseline |
+| Rate-of-change strength | 1.60 | 43.8% | rejected — more trades, worse Sharpe |
+| Strict filter (RSI band + thrust + volume) | 1.71 | 51.4% | rejected — helps in-sample only |
+| **Drop momentum entirely** | 1.68 | — | neutral |
+
+Over the full 5 years, including momentum gives Sharpe 1.98 against 1.99 without
+it. **Momentum is statistically neutral in this universe over this period** — it
+neither adds nor destroys value.
+
+The strict-filter variant looked promising in-sample (momentum win rate 36.4% →
+51.6%) but was flat out-of-sample (52.6% → 51.4%). Adopting it would have been
+fitting to noise. It was rejected for that reason.
+
+Momentum is retained rather than deleted because it costs nothing, and because
+mean reversion alone would leave the system with no trend-following capability
+at all should market character change. The honest statement is that on this data
+it does not contribute.
+
+One tempting but invalid number: running momentum *alone* reports Sharpe 7.88.
+That is an artifact, not a result — with only 66 trades the strategy is almost
+never invested (max drawdown 0.45%), which collapses the volatility denominator.
+It is recorded here as a caution, not a claim.
 
 **Exit breakdown:** 55% stop loss, 39% take profit, 4% time exit. With a 5% stop
 and 10% target the strategy needs only a 33% win rate to break even; it achieves

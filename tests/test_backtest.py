@@ -229,3 +229,51 @@ def test_sharpe_is_zero_without_variance():
     engine.equity_curve = [{"date": pd.Timestamp("2024-01-01"), "equity": 100_000.0,
                             "cash": 100_000.0, "n_positions": 0}] * 10
     assert engine.compute_metrics()["sharpe_ratio"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Momentum signal — documents a known design weakness
+# ---------------------------------------------------------------------------
+
+def test_momentum_strength_is_structurally_small_at_crossover():
+    """
+    Documents a real flaw rather than asserting correctness.
+
+    The momentum entry requires a FRESH EMA crossover — the bar where fast and
+    slow EMAs are by definition nearly equal — then scores conviction from their
+    spread. At a fresh crossover that spread is ~0, so strength is always tiny
+    and most crossovers are discarded by a threshold the entry condition itself
+    guarantees will fail.
+
+    Measured over 5 years: 314 of 474 crossovers were rejected this way.
+
+    Fixes were tested (rate-of-change strength; a stricter RSI/thrust/volume
+    filter) and both were rejected for failing to generalize out-of-sample.
+    Momentum is statistically neutral here: Sharpe 1.98 with it, 1.99 without.
+    This test pins the behavior so a future change is a deliberate decision.
+    """
+    engine = BacktestEngine(BacktestConfig())
+
+    # Construct a clean upward crossover.
+    closes = [100.0] * 30 + [100.0 + i * 0.5 for i in range(30)]
+    df = make_prices(closes)
+    d = engine._precompute_indicators({"T": df})["T"]
+
+    crossover_idx = None
+    for i in range(1, len(d)):
+        prev_f, prev_s = d["ema_fast"].iloc[i - 1], d["ema_slow"].iloc[i - 1]
+        fast, slow = d["ema_fast"].iloc[i], d["ema_slow"].iloc[i]
+        if pd.notna(prev_f) and pd.notna(slow) and prev_f <= prev_s and fast > slow:
+            crossover_idx = i
+            break
+
+    assert crossover_idx is not None, "expected a crossover in this series"
+
+    spread = abs(d["ema_fast"].iloc[crossover_idx] - d["ema_slow"].iloc[crossover_idx])
+    relative_spread = spread / d["ema_slow"].iloc[crossover_idx]
+
+    # The defining property: spread at a fresh crossover is negligible.
+    assert relative_spread < 0.01, (
+        f"spread at crossover was {relative_spread:.4f} — if this grows, the "
+        "strength formula may no longer be structurally suppressed"
+    )
