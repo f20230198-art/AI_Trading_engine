@@ -29,7 +29,7 @@ class PortfolioAgent(BaseAgent):
         try:
             cycle = context.get("cycle", 0)
             positions = context.get("positions", [])
-            equity = context.get("equity", TRADING_CONFIG.initial_capital)
+            equity = context.get("equity") or TRADING_CONFIG.initial_capital
 
             # Check if it's time to rebalance (every 30 cycles ~ 30 min at 60s cycles)
             cycles_since_last = cycle - self._last_rebalance_cycle

@@ -9,6 +9,7 @@ from typing import Any, Dict, List
 
 from agents.base_agent import BaseAgent
 from core.conflict_logger import conflict_logger
+from core.position_sizer import build_sized_trades, enforce_vetoes
 from core.shared_state import shared_state
 from config import TRADING_CONFIG
 
@@ -39,7 +40,7 @@ class OrchestratorAgent(BaseAgent):
             portfolio_result = context.get("portfolio", {})
 
             regime = shared_state.current_regime
-            equity = context.get("equity", TRADING_CONFIG.initial_capital)
+            equity = context.get("equity") or TRADING_CONFIG.initial_capital
 
             # 1. Detect and log conflicts
             conflicts = self._detect_conflicts(strategy_result, risk_result, sector_results)
@@ -72,9 +73,13 @@ Your inputs come from 8+ specialized agents. Your job:
 Decision rules:
 - In CRISIS regime, Risk Guardian's VETO is absolute — you cannot override it
 - In other regimes, you CAN override Risk if conviction is very high (>0.85) and
-  the risk concern is minor
+  the risk concern is minor. To do so you MUST set "override_risk_veto": true on
+  that decision. Omitting the field means the veto stands.
 - Always explain your reasoning when overriding any agent
 - Position sizes from Risk Guardian's adjustments are binding
+- Do NOT output share quantities. Position sizing is computed deterministically
+  from position_size_pct, live price, and portfolio equity. Your job is to decide
+  WHETHER each trade executes, not how large it is.
 
 Output valid JSON:
 {
@@ -82,7 +87,6 @@ Output valid JSON:
     {
       "symbol": "TICKER",
       "action": "BUY|SELL|HOLD",
-      "qty": 10,
       "order_type": "MARKET|LIMIT",
       "limit_price": null,
       "stop_loss_pct": 2.0,
@@ -90,6 +94,7 @@ Output valid JSON:
       "strategy": "MOMENTUM|MEAN_REVERSION|SENTIMENT_SPIKE",
       "conviction": 0.0 to 1.0,
       "decision": "EXECUTE|HOLD|REJECT",
+      "override_risk_veto": false,
       "reasoning": "full reasoning chain"
     }
   ],
@@ -136,21 +141,33 @@ JSON only."""
             briefing = analysis.get("doom_speaks", "Awaiting next cycle data.")
             await shared_state.add_doom_speaks(briefing)
 
-            # 4. Build approved trades list for execution
-            approved_trades = []
-            for decision in analysis.get("final_decisions", []):
-                if decision.get("decision") == "EXECUTE" and decision.get("action") in ("BUY", "SELL"):
-                    approved_trades.append({
-                        "symbol": decision["symbol"],
-                        "action": decision["action"],
-                        "qty": decision.get("qty", 1),
-                        "entry_type": decision.get("order_type", "MARKET"),
-                        "limit_price": decision.get("limit_price"),
-                        "stop_loss_pct": decision.get("stop_loss_pct"),
-                        "originating_agent": decision.get("originating_agent", "strategy"),
-                        "strategy": decision.get("strategy", "unknown"),
-                        "conviction": decision.get("conviction", 0),
-                    })
+            # 4. Build approved trades list for execution.
+            #    Sizing is deterministic and computed in code — the LLM's `qty` is
+            #    ignored entirely. We iterate proposals rather than final_decisions
+            #    so the quant fallback (which returns no decisions) can still trade.
+            proposals = strategy_result.get("proposals", [])
+            reviewed = risk_result.get("reviewed", [])
+
+            approved_trades, skipped = build_sized_trades(
+                proposals=proposals,
+                reviewed=reviewed,
+                equity=context.get("equity"),
+                quotes=context.get("quotes", {}),
+                regime=regime,
+                positions=context.get("positions", []),
+                llm_decisions=analysis.get("final_decisions", []),
+            )
+
+            # Defense in depth: nothing carrying a veto reaches execution.
+            approved_trades, vetoed_blocked = enforce_vetoes(approved_trades, reviewed, regime)
+            skipped.extend(vetoed_blocked)
+
+            if skipped:
+                logger.warning(
+                    "Orchestrator: %d trade(s) not executed — %s",
+                    len(skipped),
+                    ", ".join(f"{s['symbol']}({s['reason']})" for s in skipped),
+                )
 
             # Store decision
             await self._store_decision(
@@ -172,13 +189,15 @@ JSON only."""
 
             await self.update_status(
                 "ACTIVE",
-                f"Approved {len(approved_trades)} trades | {len(conflicts)} conflicts resolved"
+                f"Approved {len(approved_trades)} trades | {len(skipped)} skipped "
+                f"| {len(conflicts)} conflicts resolved"
             )
 
             return {
                 "agent": self.name,
                 "analysis": analysis,
                 "approved_trades": approved_trades,
+                "skipped_trades": skipped,
                 "conflicts": conflicts,
                 "briefing": briefing,
             }

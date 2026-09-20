@@ -152,7 +152,10 @@ class DoomEngine:
 
         await shared_state.increment_cycle()
 
-        context = {"cycle": self._cycle, "equity": TRADING_CONFIG.initial_capital}
+        # Equity starts unknown and is filled from the live Alpaca account below.
+        # Seeding it with initial_capital would size real orders against a
+        # fictional $100k book whenever the account could not be read.
+        context = {"cycle": self._cycle, "equity": None}
 
         try:
             # Phase 1: Data Gathering (parallel)

@@ -125,8 +125,25 @@ class ExecutionAgent(BaseAgent):
         """Place a single order via Alpaca with retry logic."""
         symbol = trade["symbol"]
         action = trade["action"].lower()  # buy or sell
-        qty = trade.get("qty", 1)
         order_type = trade.get("entry_type", "market").lower()
+
+        # Never fall back to a nominal size. A trade that reaches here without a
+        # deterministic qty was not sized against portfolio equity, so it cannot
+        # be shown to respect max_position_pct — refuse it rather than guess.
+        try:
+            qty = int(trade.get("qty") or 0)
+        except (TypeError, ValueError):
+            qty = 0
+        if qty <= 0:
+            logger.error(
+                f"Refusing to place {action.upper()} {symbol}: qty={trade.get('qty')!r} "
+                "— trade was not sized deterministically."
+            )
+            return {
+                "success": False,
+                "symbol": symbol,
+                "error": "Invalid qty — trade not sized",
+            }
 
         # Build order payload
         order = {

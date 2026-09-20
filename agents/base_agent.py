@@ -338,7 +338,9 @@ class BaseAgent(ABC):
             # Risk fields
             "risk_score": 30,
             "risk_label": "LOW",
-            "reviewed": [],
+            # Must match the key risk_guardian actually reads. Left empty on
+            # purpose — _enforce_hard_rules() synthesizes one entry per proposal.
+            "reviewed_proposals": [],
             "portfolio_risk_summary": "Quant risk assessment: conservative posture.",
             # Portfolio fields
             "portfolio_health": "NOMINAL",

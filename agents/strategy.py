@@ -34,7 +34,7 @@ class StrategyAgent(BaseAgent):
 
             sentiment_analysis = context.get("sentiment", {}).get("analysis", {})
             regime = shared_state.current_regime
-            portfolio_equity = context.get("equity", TRADING_CONFIG.initial_capital)
+            portfolio_equity = context.get("equity") or TRADING_CONFIG.initial_capital
 
             # Build comprehensive input for the Strategy LLM
             regime_context = self._get_regime_context()
@@ -109,7 +109,11 @@ ALL AGENT INPUTS:
 Generate ranked trade proposals across all three sub-strategies.
 Be selective — only propose high-conviction trades. JSON only."""
 
-            response = await self._call_llm(system_prompt, user_prompt, max_tokens=1500)
+            # Pass the cycle context through so the quant fallback can compute
+            # real signals from live quotes when no LLM backend is available.
+            response = await self._call_llm(
+                system_prompt, user_prompt, max_tokens=1500, context=context
+            )
 
             analysis = self._parse_json(response)
             if not analysis:
@@ -153,6 +157,126 @@ Be selective — only propose high-conviction trades. JSON only."""
             await self.update_status("ERROR", str(e)[:100])
             logger.error(f"Strategy error: {e}", exc_info=True)
             raise
+
+    def _quant_fallback(self, context: Dict) -> str:
+        """
+        Deterministic strategy — real signals, no LLM, no network.
+
+        The base implementation returns an empty proposal list, which meant the
+        advertised "always works without API keys" mode could never place a trade.
+        This computes momentum and mean-reversion signals from the quotes already
+        fetched by market_intel this cycle.
+
+        Momentum:       price above VWAP and up on the day -> BUY
+        Mean reversion: stretched well below the day's range in a RANGING regime -> BUY
+        Sizing is left as position_size_pct; the sizer converts it to shares.
+        """
+        import json
+
+        regime = shared_state.current_regime or "RANGING"
+        quotes = context.get("quotes") or {}
+        sentiment_scores = context.get("sentiment", {}).get("analysis", {}).get(
+            "symbol_sentiments", {}
+        )
+
+        momentum, mean_reversion, proposals = [], [], []
+
+        for symbol, quote in quotes.items():
+            try:
+                price = float(quote.get("price") or 0)
+                change_pct = float(quote.get("change_pct") or 0)
+                vwap = float(quote.get("vwap") or 0)
+                high = float(quote.get("high") or 0)
+                low = float(quote.get("low") or 0)
+            except (TypeError, ValueError):
+                continue
+            if price <= 0:
+                continue
+
+            # --- Momentum: trading above VWAP with positive daily change ---
+            if vwap > 0 and price > vwap and change_pct > 0.5:
+                strength = min(1.0, change_pct / 3.0)
+                momentum.append({
+                    "symbol": symbol,
+                    "direction": "BUY",
+                    "strength": round(strength, 3),
+                    "reasoning": f"Price ${price:.2f} above VWAP ${vwap:.2f}, {change_pct:+.2f}% on day",
+                })
+                proposals.append({
+                    "symbol": symbol,
+                    "action": "BUY",
+                    "strategy": "MOMENTUM",
+                    "conviction": round(strength, 3),
+                    "position_size_pct": round(1.0 + 2.0 * strength, 2),
+                    "entry_type": "MARKET",
+                    "stop_loss_pct": 2.0,
+                    "take_profit_pct": 5.0,
+                    "reasoning": f"Quant momentum: above VWAP, {change_pct:+.2f}% daily move",
+                    "_score": strength,
+                })
+
+            # --- Mean reversion: near the low of the day's range while ranging ---
+            elif regime in ("RANGING", "HIGH_VOLATILITY") and high > low > 0:
+                position_in_range = (price - low) / (high - low)
+                if position_in_range < 0.25 and change_pct < -0.5:
+                    strength = min(1.0, abs(change_pct) / 3.0)
+                    mean_reversion.append({
+                        "symbol": symbol,
+                        "direction": "BUY",
+                        "strength": round(strength, 3),
+                        "reasoning": f"At {position_in_range:.0%} of daily range, {change_pct:+.2f}%",
+                    })
+                    proposals.append({
+                        "symbol": symbol,
+                        "action": "BUY",
+                        "strategy": "MEAN_REVERSION",
+                        "conviction": round(strength, 3),
+                        "position_size_pct": round(1.0 + 1.5 * strength, 2),
+                        "entry_type": "MARKET",
+                        "stop_loss_pct": 2.5,
+                        "take_profit_pct": 4.0,
+                        "reasoning": (
+                            f"Quant mean reversion: bottom of daily range "
+                            f"({position_in_range:.0%}), {change_pct:+.2f}%"
+                        ),
+                        "_score": strength,
+                    })
+
+        # Rank by signal strength, nudged by sentiment when it is available.
+        for proposal in proposals:
+            score = proposal.pop("_score", 0)
+            raw = sentiment_scores.get(proposal["symbol"])
+            if isinstance(raw, dict):
+                raw = raw.get("score", 0)
+            try:
+                score += 0.2 * float(raw or 0)
+            except (TypeError, ValueError):
+                pass
+            proposal["_rank_score"] = score
+
+        proposals.sort(key=lambda p: p.pop("_rank_score", 0), reverse=True)
+        proposals = proposals[:5]  # stay selective, as the LLM prompt instructs
+        for i, proposal in enumerate(proposals, 1):
+            proposal["rank"] = i
+
+        logger.info(
+            "Strategy quant fallback: %d proposals from %d quotes (regime=%s)",
+            len(proposals), len(quotes), regime,
+        )
+
+        return json.dumps({
+            "strategy_assessment": (
+                f"Quant mode: {len(momentum)} momentum and {len(mean_reversion)} "
+                f"mean-reversion signals across {len(quotes)} symbols in {regime} regime."
+            ),
+            "sub_strategy_signals": {
+                "momentum": momentum,
+                "mean_reversion": mean_reversion,
+                "sentiment_spike": [],
+            },
+            "trade_proposals": proposals,
+            "no_trade_symbols": [],
+        })
 
     def _format_inputs(
         self,
