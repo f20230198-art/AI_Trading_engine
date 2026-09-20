@@ -7,3 +7,4 @@ data/performance.db
 data/doom.log
 .venv/
 venv/
+results/trades_*.csv

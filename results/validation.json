@@ -1,0 +1,155 @@
+{
+  "generated_at": "2026-09-20T11:01:40.113007+00:00",
+  "windows": {
+    "OUT-OF-SAMPLE (3y)": {
+      "strategy": {
+        "initial_capital": 100000.0,
+        "final_equity": 121132.08,
+        "total_return_pct": 21.13,
+        "cagr_pct": 7.13,
+        "sharpe_ratio": 1.74,
+        "sortino_ratio": 1.77,
+        "max_drawdown_pct": 3.52,
+        "calmar_ratio": 2.03,
+        "total_trades": 297,
+        "win_rate_pct": 48.8,
+        "profit_factor": 1.45,
+        "avg_win": 203.82,
+        "avg_loss": -134.43,
+        "avg_holding_days": 11.0,
+        "total_costs": 595.51,
+        "cost_drag_pct": 0.6,
+        "trading_days": 701,
+        "by_strategy": {
+          "MEAN_REVERSION": {
+            "trades": 259,
+            "win_rate": 48.3,
+            "total_pnl": 7642.26,
+            "avg_pnl": 29.51
+          },
+          "MOMENTUM": {
+            "trades": 38,
+            "win_rate": 52.6,
+            "total_pnl": 1478.94,
+            "avg_pnl": 38.92
+          }
+        },
+        "exit_reasons": {
+          "STOP_LOSS": 128,
+          "TAKE_PROFIT": 72,
+          "TIME_EXIT": 88,
+          "END_OF_TEST": 9
+        }
+      },
+      "benchmark": {
+        "final_equity": 128446.62,
+        "total_return_pct": 28.45,
+        "cagr_pct": 9.42,
+        "sharpe_ratio": 0.59,
+        "max_drawdown_pct": 24.43
+      },
+      "start": "2021-09-20",
+      "end": "2024-09-16"
+    },
+    "IN-SAMPLE (2y)": {
+      "strategy": {
+        "initial_capital": 100000.0,
+        "final_equity": 118438.75,
+        "total_return_pct": 18.44,
+        "cagr_pct": 9.85,
+        "sharpe_ratio": 2.21,
+        "sortino_ratio": 3.43,
+        "max_drawdown_pct": 1.95,
+        "calmar_ratio": 5.06,
+        "total_trades": 181,
+        "win_rate_pct": 53.6,
+        "profit_factor": 1.9,
+        "avg_win": 222.97,
+        "avg_loss": -135.51,
+        "avg_holding_days": 10.8,
+        "total_costs": 362.0,
+        "cost_drag_pct": 0.36,
+        "trading_days": 454,
+        "by_strategy": {
+          "MEAN_REVERSION": {
+            "trades": 159,
+            "win_rate": 56.0,
+            "total_pnl": 10651.09,
+            "avg_pnl": 66.99
+          },
+          "MOMENTUM": {
+            "trades": 22,
+            "win_rate": 36.4,
+            "total_pnl": -405.85,
+            "avg_pnl": -18.45
+          }
+        },
+        "exit_reasons": {
+          "STOP_LOSS": 75,
+          "TIME_EXIT": 53,
+          "TAKE_PROFIT": 49,
+          "END_OF_TEST": 4
+        }
+      },
+      "benchmark": {
+        "final_equity": 130376.16,
+        "total_return_pct": 30.38,
+        "cagr_pct": 15.86,
+        "sharpe_ratio": 0.95,
+        "max_drawdown_pct": 18.73
+      },
+      "start": "2024-09-16",
+      "end": "2026-09-19"
+    },
+    "FULL PERIOD (5y)": {
+      "strategy": {
+        "initial_capital": 100000.0,
+        "final_equity": 143979.35,
+        "total_return_pct": 43.98,
+        "cagr_pct": 7.92,
+        "sharpe_ratio": 1.98,
+        "sortino_ratio": 2.23,
+        "max_drawdown_pct": 3.52,
+        "calmar_ratio": 2.25,
+        "total_trades": 488,
+        "win_rate_pct": 50.8,
+        "profit_factor": 1.66,
+        "avg_win": 222.94,
+        "avg_loss": -138.97,
+        "avg_holding_days": 11.3,
+        "total_costs": 977.51,
+        "cost_drag_pct": 0.98,
+        "trading_days": 1205,
+        "by_strategy": {
+          "MEAN_REVERSION": {
+            "trades": 424,
+            "win_rate": 51.9,
+            "total_pnl": 21131.73,
+            "avg_pnl": 49.84
+          },
+          "MOMENTUM": {
+            "trades": 64,
+            "win_rate": 43.8,
+            "total_pnl": 804.64,
+            "avg_pnl": 12.57
+          }
+        },
+        "exit_reasons": {
+          "STOP_LOSS": 205,
+          "TAKE_PROFIT": 126,
+          "TIME_EXIT": 153,
+          "END_OF_TEST": 4
+        }
+      },
+      "benchmark": {
+        "final_equity": 178531.25,
+        "total_return_pct": 78.53,
+        "cagr_pct": 12.89,
+        "sharpe_ratio": 0.79,
+        "max_drawdown_pct": 24.43
+      },
+      "start": "2021-09-20",
+      "end": "2026-09-19"
+    }
+  }
+}
