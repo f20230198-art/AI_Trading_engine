@@ -31,6 +31,7 @@ from core.regime_detector import regime_detector
 from core.memory_store import memory_store
 from core.conflict_logger import conflict_logger
 from core.performance_tracker import performance_tracker
+from core.risk_enforcer import apply_risk_enforcement
 
 from agents.market_intel import MarketIntelAgent
 from agents.sector_combined import SectorCombinedAgent
@@ -269,6 +270,20 @@ class DoomEngine:
             logger.info("Phase 5: Orchestrator decision...")
             orchestrator_result = await self._safe_run(self.orchestrator, context)
 
+            # Phase 5b: Deterministic risk enforcement — config.py limits in plain
+            # Python, after the Risk Guardian and before Execution.
+            if orchestrator_result and orchestrator_result.get("approved_trades"):
+                orchestrator_result["approved_trades"] = await apply_risk_enforcement(
+                    trades=orchestrator_result["approved_trades"],
+                    reviewed=context["risk_guardian"].get("reviewed", []),
+                    equity=context.get("equity"),
+                    positions=context.get("positions", []),
+                    daily_drawdown_pct=max(
+                        float(context["risk_guardian"].get("daily_drawdown_pct") or 0),
+                        performance_tracker.compute_daily_drawdown(),
+                    ),
+                )
+
             # Phase 6: Execution
             if shared_state.emergency_stop:
                 logger.warning("Emergency stop active. Skipping execution phase.")
@@ -328,12 +343,17 @@ class DoomEngine:
         await self.initialize()
         self._running = True
 
+        # Carries a strike consumed by the sleep loop into the next iteration,
+        # so a strike requested while paused still runs exactly one cycle.
+        pending_strike = False
+
         while self._running:
             try:
                 if shared_state.emergency_stop:
                     logger.warning("Emergency stop active. Trading loop halted.")
                 else:
-                    manual_strike = await shared_state.consume_manual_strike()
+                    manual_strike = pending_strike or await shared_state.consume_manual_strike()
+                    pending_strike = False
                     if shared_state.trading_paused and not manual_strike:
                         logger.info("Trading paused. Waiting for resume or manual strike.")
                     else:
@@ -353,12 +373,17 @@ class DoomEngine:
                 logger.info(f"Sleeping {TRADING_CONFIG.cycle_interval_seconds}s until next cycle...")
                 elapsed = 0
                 while self._running and elapsed < TRADING_CONFIG.cycle_interval_seconds:
-                    # Wake quickly on control changes so War Room commands feel immediate
-                    if (
-                        shared_state.emergency_stop
-                        or shared_state.trading_paused
-                        or shared_state.manual_strike_requested
-                    ):
+                    # Wake early on control changes so War Room commands feel
+                    # immediate. A strike is CONSUMED here rather than merely
+                    # observed: the flag is otherwise cleared at the top of the
+                    # loop, so breaking on it without clearing it re-triggers on
+                    # every subsequent sleep and the engine free-runs, burning
+                    # cycles and LLM quota.
+                    if shared_state.emergency_stop or shared_state.trading_paused:
+                        break
+                    if await shared_state.consume_manual_strike():
+                        logger.info("Manual strike received — running next cycle now.")
+                        pending_strike = True
                         break
                     await asyncio.sleep(1)
                     elapsed += 1
