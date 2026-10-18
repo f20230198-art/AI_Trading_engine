@@ -197,6 +197,10 @@ def test_record_then_replay_is_identical_and_offline(db_path, tmp_path):
     ("Profit was $9,999,999.", [[10255.17]], ["$9,999,999"]),
     ("Top 3 symbols", [[1], [2], [3]], []),
     ("In 2025-04 it made 3861.58.", [["2025-04", 3861.58]], []),
+    ("Roughly $6.8k for the year.", [[6816.96]], []),
+    ("Ended near $110k.", [[109934.47]], []),
+    ("About $9k profit.", [[6816.96]], ["$9k"]),
+    ("The loss rate was 46.41%.", [[53.59]], ["46.41"]),
 ])
 def test_grounding_check(text, rows, expected):
     assert find_ungrounded_numbers(text, rows) == expected
