@@ -287,6 +287,14 @@ class AnalystAgent(BaseAgent):
             raise RuntimeError("answer step returned no answer (LLM output unparseable)")
 
         ungrounded = find_ungrounded_numbers(f"{answer} {insight}", query.rows, question)
+        if ungrounded:
+            # A number the rows do not contain is either a hallucination or the
+            # result of an instruction smuggled in through the data. Either way
+            # the model's prose is withheld; the user still gets the real rows.
+            logger.warning(f"Analyst: withheld answer with ungrounded numbers {ungrounded}")
+            answer = (f"The query returned {len(query.rows)} row(s), shown below. The written "
+                      "summary was withheld because it contained numbers not found in the data.")
+            insight = ""
         result.update(
             status="answered", answer=answer, insight=insight,
             grounded=not ungrounded, ungrounded_numbers=ungrounded,
@@ -322,6 +330,7 @@ class AnalystAgent(BaseAgent):
 # Post-processing helpers (pure functions, unit-tested)
 # ---------------------------------------------------------------------------
 _NUMBER_RE = re.compile(r"(?<![\w.])-?\$?\d[\d,]*(?:\.\d+)?")
+_DATE_RE = re.compile(r"^\d{4}-\d{2}(-\d{2})?([T ][\d:.]+)?$")
 
 
 def _numbers_in(text: str) -> List[float]:
@@ -346,8 +355,11 @@ def find_ungrounded_numbers(text: str, rows: List[List[Any]], question: str = ""
         for value in row:
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 allowed.add(abs(float(value)))
-            elif isinstance(value, str):
-                allowed.update(abs(n) for n in _numbers_in(value))
+            elif isinstance(value, str) and _DATE_RE.match(value):
+                # Only structured date/month strings count. Numbers inside free
+                # text are untrusted: an injected "$9,999,999" in an agent's
+                # reasoning must not be able to vouch for itself.
+                allowed.update(abs(n) for n in _numbers_in(value.replace("-", " ")))
     allowed.update(abs(n) for n in _numbers_in(question))
 
     offending = []
