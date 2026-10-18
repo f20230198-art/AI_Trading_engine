@@ -9,3 +9,4 @@ data/doom.log
 venv/
 results/trades_*.csv
 data/analytics.db
+data/analyst_audit.jsonl

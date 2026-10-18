@@ -159,6 +159,12 @@ class BaseAgent(ABC):
     Every agent makes real LLM API calls, has memory, and adapts to regime.
     """
 
+    # Per-agent overrides for cloud calls. None/0.3 keep the global LLM_MODEL and
+    # the historical temperature, so existing agents behave exactly as before.
+    llm_model: Optional[str] = None
+    llm_temperature: float = 0.3
+    llm_seed: Optional[int] = None
+
     def __init__(self, name: str, role: str):
         self.name = name
         self.role = role
@@ -168,6 +174,7 @@ class BaseAgent(ABC):
         self.total_calls = 0
         self.errors = 0
         self._client: Optional[httpx.AsyncClient] = None
+        self.last_usage: Optional[Dict] = None  # token usage of the latest cloud call, if reported
 
     async def initialize(self):
         """
@@ -408,17 +415,19 @@ class BaseAgent(ABC):
                 "Content-Type": "application/json",
             },
             json={
-                "model": LLM_MODEL,
+                "model": self.llm_model or LLM_MODEL,
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
                 "max_tokens": max_tokens,
-                "temperature": 0.3,
+                "temperature": self.llm_temperature,
+                **({"seed": self.llm_seed} if self.llm_seed is not None else {}),
             },
         )
         response.raise_for_status()
         payload = response.json()
+        self.last_usage = payload.get("usage")
         choices = payload.get("choices", [])
         if not choices:
             raise RuntimeError("Groq returned no choices")

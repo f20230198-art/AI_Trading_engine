@@ -23,6 +23,7 @@ from core.performance_tracker import performance_tracker
 from core.conflict_logger import conflict_logger
 from core.regime_detector import regime_detector
 from core.memory_store import memory_store
+from core.analytics_db import SCHEMA_DOCS
 
 logger = logging.getLogger("doom.api")
 
@@ -40,6 +41,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class AnalystQuestion(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500)
 
 
 class ManualOrderRequest(BaseModel):
@@ -361,6 +366,34 @@ async def control_manual_order(order: ManualOrderRequest):
     except Exception as e:
         logger.error(f"Manual order failed: {e}", exc_info=True)
         return {"ok": False, "message": f"Manual order failed: {str(e)[:180]}"}
+
+
+# ---------------------------------------------------------------------------
+# Analyst agent — natural-language questions over the engine's own data
+# ---------------------------------------------------------------------------
+_analyst = None
+
+
+def _get_analyst():
+    """Create the Analyst lazily so the API starts even if the LLM is down."""
+    global _analyst
+    if _analyst is None:
+        from agents.analyst import AnalystAgent
+        _analyst = AnalystAgent()
+    return _analyst
+
+
+@app.post("/api/analyst/ask")
+async def analyst_ask(req: AnalystQuestion):
+    """Answer a business question with SQL over the analytics DB, plus an insight and chart."""
+    result = await _get_analyst().ask(req.question)
+    return {"ok": result["status"] == "answered", **result}
+
+
+@app.get("/api/analyst/schema")
+async def analyst_schema():
+    """The data dictionary the Analyst works from (tables, views, column docs)."""
+    return {"tables": SCHEMA_DOCS}
 
 
 # ---------------------------------------------------------------------------

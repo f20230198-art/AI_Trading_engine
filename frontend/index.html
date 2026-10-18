@@ -1506,6 +1506,128 @@ function TerminalTab({s,doomSpeaks}){
   );
 }
 
+/* ── ANALYST TAB ─────────────────────────────────────────────── */
+const ANALYST_EXAMPLES=[
+  'Which sector made the most money?',
+  'Win rate by market regime',
+  'Monthly P&L over time',
+  'What was the largest drawdown and when?',
+];
+
+function AnalystChart({chart}){
+  const ref=useRef(null), inst=useRef(null);
+  useEffect(()=>{
+    if(!ref.current||!chart)return;
+    inst.current?.destroy();
+    inst.current=new Chart(ref.current.getContext('2d'),{
+      type:chart.type,
+      data:{labels:chart.labels,datasets:[{
+        label:chart.y,data:chart.values,
+        borderColor:'#00d4ff',borderWidth:1.5,tension:0.3,pointRadius:0,
+        backgroundColor:chart.type==='bar'
+          ?chart.values.map(v=>v<0?'rgba(255,96,96,0.55)':'rgba(0,212,255,0.45)')
+          :'rgba(0,212,255,0.12)',
+        fill:chart.type==='line',
+      }]},
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:'rgba(0,212,255,0.45)',font:{family:'Space Grotesk',size:9},maxTicksLimit:12},grid:{display:false}},
+          y:{ticks:{color:'rgba(0,212,255,0.45)',font:{family:'Space Grotesk',size:9}},grid:{color:'rgba(0,212,255,0.05)'}},
+        },
+      },
+    });
+    return()=>{ inst.current?.destroy(); inst.current=null; };
+  },[chart]);
+  return <canvas ref={ref} style={{width:'100%',height:'100%'}}/>;
+}
+
+function AnalystTab({apiBase}){
+  const [q,setQ]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [res,setRes]=useState(null);
+
+  const ask=async(question)=>{
+    const text=(question??q).trim(); if(!text||busy)return;
+    setQ(text); setBusy(true); setRes(null);
+    try{
+      const r=await fetch(`${apiBase}/api/analyst/ask`,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question:text}),
+      });
+      const payload=await r.json().catch(()=>({}));
+      setRes(r.ok?payload:{status:'error',answer:payload.detail?.[0]?.msg||`Request failed (${r.status})`});
+    }catch(e){ setRes({status:'error',answer:'Analyst is unreachable.'}); }
+    finally{ setBusy(false); }
+  };
+
+  const statusColor={answered:'#00d4ff',refused:'#ffb955',blocked:'#ff6060',error:'#ff6060'}[res?.status]||'#bbc9cf';
+
+  return(
+    <div className="tab-panel" style={{padding:14,gap:14,flexDirection:'column',overflow:'auto'}}>
+      <div className="panel" style={{padding:'12px 14px'}}>
+        <SecHeader label="Analyst // Ask The Data" icon="query_stats"/>
+        <div style={{display:'flex',gap:8,marginTop:8}}>
+          <input className="terminal-input" style={{flex:1,border:'1px solid rgba(0,212,255,0.2)',padding:'8px 10px'}}
+            value={q} maxLength={500} onChange={e=>setQ(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&ask()}
+            placeholder="e.g. Which symbols lost the most money on stop-losses?"/>
+          <button className="tab-btn active" disabled={busy} onClick={()=>ask()}>{busy?'THINKING…':'ASK'}</button>
+        </div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6,marginTop:8}}>
+          {ANALYST_EXAMPLES.map(x=>(
+            <button key={x} className="tab-btn" style={{fontSize:9}} disabled={busy} onClick={()=>ask(x)}>{x}</button>
+          ))}
+        </div>
+      </div>
+
+      {res&&(
+        <div style={{display:'flex',gap:14,minHeight:0,flexWrap:'wrap'}}>
+          <div className="panel" style={{flex:'1 1 360px',padding:'12px 14px',display:'flex',flexDirection:'column',gap:8}}>
+            <div className="label" style={{color:statusColor}}>{(res.status||'').toUpperCase()}
+              {res.grounded===false&&<span style={{color:'#ffb955'}}> · UNVERIFIED NUMBERS: {res.ungrounded_numbers.join(', ')}</span>}
+            </div>
+            <div style={{color:'#e2dff0',fontSize:14,lineHeight:1.5,whiteSpace:'pre-wrap'}}>{res.answer}</div>
+            {res.insight&&<div style={{color:'#ffb955',fontSize:12,lineHeight:1.5}}>{res.insight}</div>}
+            {res.sql&&(
+              <details>
+                <summary className="label" style={{cursor:'pointer'}}>SQL</summary>
+                <pre style={{color:'#bbc9cf',fontSize:11,whiteSpace:'pre-wrap',margin:'6px 0 0'}}>{res.sql}</pre>
+              </details>
+            )}
+            {res.latency_ms!=null&&(
+              <div className="label" style={{color:'#3a4a55'}}>
+                {res.row_count} rows{res.truncated?' (truncated)':''} · {Math.round(res.latency_ms)} ms · {res.tokens?.total_tokens||0} tokens
+              </div>
+            )}
+          </div>
+          {res.chart&&(
+            <div className="panel" style={{flex:'1 1 360px',padding:'12px 14px',height:280}}>
+              <AnalystChart chart={res.chart}/>
+            </div>
+          )}
+        </div>
+      )}
+
+      {res?.columns?.length>0&&(
+        <div className="panel" style={{padding:'12px 14px',overflow:'auto',maxHeight:320}}>
+          <table style={{width:'100%',borderCollapse:'collapse',fontSize:11,color:'#bbc9cf'}}>
+            <thead><tr>{res.columns.map(c=>(
+              <th key={c} className="label" style={{textAlign:'left',padding:'4px 8px'}}>{c}</th>
+            ))}</tr></thead>
+            <tbody>{res.rows.map((r,i)=>(
+              <tr key={i} style={{borderTop:'1px solid rgba(0,212,255,0.06)'}}>
+                {r.map((v,j)=><td key={j} style={{padding:'4px 8px'}}>{v===null?'—':String(v)}</td>)}
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── ARCHIVE TAB ──────────────────────────────────────────────── */
 function ArchiveTab({recentTrades,attribution}){
   const agents=Object.values(attribution?.by_agent||{}).sort((a,b)=>(b.total_pnl||0)-(a.total_pnl||0));
@@ -1682,7 +1804,7 @@ function App(){
   const livePositions=s.live_positions||[];
   const attribution =s.attribution   ||{};
 
-  const tabs=['TACTICAL','ASSETS','TERMINAL','ARCHIVE'];
+  const tabs=['TACTICAL','ASSETS','TERMINAL','ARCHIVE','ANALYST'];
 
   return(
     <div id="app">
@@ -1740,6 +1862,7 @@ function App(){
         {tab==='ASSETS'   && <AssetsTab   quotes={quotes} openTrades={openTrades} recentTrades={recentTrades} attribution={attribution}/>}
         {tab==='TERMINAL' && <TerminalTab s={s} doomSpeaks={doomSpeaks}/>}
         {tab==='ARCHIVE'  && <ArchiveTab  recentTrades={recentTrades} attribution={attribution}/>}
+        {tab==='ANALYST'  && <AnalystTab  apiBase={apiBase}/>}
       </div>
 
       {/* FOOTER */}
