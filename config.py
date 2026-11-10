@@ -63,6 +63,10 @@ LLM_MODEL = os.environ.get(
 )
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "1024"))
 
+# Analyst agent (text-to-SQL). Separate from LLM_MODEL because SQL generation
+# benefits from a stronger model than the per-cycle trading agents need.
+ANALYST_LLM_MODEL = os.environ.get("ANALYST_LLM_MODEL", "openai/gpt-oss-120b")
+
 # Primary key for legacy single-key checks
 ACTIVE_LLM_API_KEY = (GROQ_API_KEYS + GEMINI_API_KEYS + [ANTHROPIC_API_KEY])[0] if (GROQ_API_KEYS or GEMINI_API_KEYS or ANTHROPIC_API_KEY) else ""
 

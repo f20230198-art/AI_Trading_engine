@@ -7,3 +7,6 @@ data/performance.db
 data/doom.log
 .venv/
 venv/
+results/trades_*.csv
+data/analytics.db
+data/analyst_audit.jsonl

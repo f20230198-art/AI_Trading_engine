@@ -8,6 +8,7 @@ import logging
 from typing import Any, Dict, List
 
 from agents.base_agent import BaseAgent
+from core.position_sizer import sector_of
 from core.shared_state import shared_state
 from core.performance_tracker import performance_tracker
 from config import TRADING_CONFIG, SECTOR_MAP
@@ -27,7 +28,7 @@ class RiskGuardianAgent(BaseAgent):
 
         try:
             proposals = context.get("proposals", [])
-            portfolio_equity = context.get("equity", TRADING_CONFIG.initial_capital)
+            portfolio_equity = context.get("equity") or TRADING_CONFIG.initial_capital
             current_positions = context.get("positions", [])
             regime = shared_state.current_regime
 
@@ -92,7 +93,8 @@ Output valid JSON:
 PORTFOLIO STATE:
   Equity: ${portfolio_equity:,.2f}
   Daily P&L: ${risk_metrics['daily_pnl']:+,.2f} ({risk_metrics['daily_pnl_pct']:+.2f}%)
-  Current Drawdown: {risk_metrics['current_drawdown_pct']:.2f}%
+  Daily Drawdown (today, peak->now): {risk_metrics['current_drawdown_pct']:.2f}% (limit {TRADING_CONFIG.max_daily_drawdown_pct * 100:.1f}%)
+  All-time Max Drawdown: {risk_metrics['max_drawdown_pct']:.2f}%
   Position Count: {risk_metrics['position_count']}
   Sector Exposure: {json.dumps(risk_metrics['sector_exposure'])}
 
@@ -119,6 +121,16 @@ Be conservative — protecting capital is your primary mandate. JSON only."""
                     "active_risk_flags": [],
                     "recommended_hedges": [],
                 }
+
+            # Enforce the hard limits in code. The LLM's review is advisory —
+            # this pass guarantees one verdict per proposal and applies the
+            # non-negotiable rules, so it works in quant fallback mode too.
+            analysis["reviewed_proposals"] = self._enforce_hard_rules(
+                proposals=proposals,
+                reviewed=analysis.get("reviewed_proposals", []),
+                risk_metrics=risk_metrics,
+                regime=regime,
+            )
 
             # Update risk in shared state
             risk_score = analysis.get("portfolio_risk_score", 50)
@@ -155,6 +167,8 @@ Be conservative — protecting capital is your primary mandate. JSON only."""
                 "reviewed": reviewed,
                 "risk_score": risk_score,
                 "risk_label": risk_label,
+                "daily_drawdown_pct": risk_metrics["current_drawdown_pct"],
+                "veto_all": bool(vetoed) and len(vetoed) == len(reviewed),
             }
 
         except Exception as e:
@@ -162,6 +176,124 @@ Be conservative — protecting capital is your primary mandate. JSON only."""
             await self.update_status("ERROR", str(e)[:100])
             logger.error(f"RiskGuardian error: {e}", exc_info=True)
             raise
+
+    def _enforce_hard_rules(
+        self,
+        proposals: List[Dict],
+        reviewed: List[Dict],
+        risk_metrics: Dict,
+        regime: str,
+    ) -> List[Dict]:
+        """
+        Apply the non-negotiable risk limits in code rather than trusting the LLM
+        to have applied them.
+
+        Also guarantees exactly one review entry per proposal. That matters for
+        the deterministic quant fallback, which returns no reviews at all — without
+        a synthesized entry those proposals would carry no verdict downstream.
+
+        Rules only ever tighten a position, never loosen one.
+        """
+        reviews_by_symbol = {r.get("symbol"): dict(r) for r in (reviewed or []) if r.get("symbol")}
+        limit_pct = TRADING_CONFIG.max_daily_drawdown_pct * 100
+        daily_dd = float(risk_metrics.get("current_drawdown_pct") or 0)
+        drawdown_breached = daily_dd >= limit_pct
+
+        if drawdown_breached:
+            logger.warning(
+                "HARD RULE: daily drawdown %.2f%% >= %.2f%% limit — vetoing ALL new trades",
+                daily_dd, limit_pct,
+            )
+
+        sector_exposure = dict(risk_metrics.get("sector_exposure") or {})
+        max_position_pct = TRADING_CONFIG.max_position_pct * 100
+        max_sector_pct = TRADING_CONFIG.max_sector_pct * 100
+
+        enforced: List[Dict] = []
+        for proposal in proposals or []:
+            symbol = proposal.get("symbol", "")
+            if not symbol:
+                continue
+
+            try:
+                proposed_pct = float(proposal.get("position_size_pct") or 0) or 1.0
+            except (TypeError, ValueError):
+                proposed_pct = 1.0
+
+            review = reviews_by_symbol.get(symbol) or {
+                "symbol": symbol,
+                "original_action": proposal.get("action", "BUY"),
+                "original_size_pct": proposed_pct,
+                "verdict": "APPROVED",
+                "adjusted_size_pct": proposed_pct,
+                "reasoning": "No LLM review returned — deterministic default applied.",
+                "risk_flags": [],
+            }
+
+            # Rule A: daily drawdown breach vetoes everything.
+            if drawdown_breached:
+                review["verdict"] = "VETOED"
+                review["adjusted_size_pct"] = None
+                review["reasoning"] = (
+                    f"Daily drawdown {daily_dd:.2f}% breached the "
+                    f"{limit_pct:.1f}% limit — all new trades vetoed."
+                )
+                enforced.append(review)
+                continue
+
+            if review.get("verdict") == "VETOED":
+                enforced.append(review)
+                continue
+
+            # Current working size for this proposal.
+            try:
+                size_pct = float(review.get("adjusted_size_pct") or proposed_pct)
+            except (TypeError, ValueError):
+                size_pct = proposed_pct
+
+            # Rule B: per-position cap.
+            if size_pct > max_position_pct:
+                logger.info(
+                    "HARD RULE: %s resized %.2f%% -> %.2f%% (max position)",
+                    symbol, size_pct, max_position_pct,
+                )
+                size_pct = max_position_pct
+                review["verdict"] = "RESIZED"
+
+            # Rule C: sector concentration cap, counting already-approved trades.
+            sector = sector_of(symbol)
+            current = float(sector_exposure.get(sector, 0) or 0)
+            headroom = max_sector_pct - current
+            if headroom <= 0:
+                review["verdict"] = "VETOED"
+                review["adjusted_size_pct"] = None
+                review["reasoning"] = (
+                    f"{sector} exposure {current:.1f}% is at the "
+                    f"{max_sector_pct:.0f}% sector cap — no headroom."
+                )
+                logger.info("HARD RULE: %s vetoed — %s sector cap reached", symbol, sector)
+                enforced.append(review)
+                continue
+            if size_pct > headroom:
+                logger.info(
+                    "HARD RULE: %s resized %.2f%% -> %.2f%% (%s sector headroom)",
+                    symbol, size_pct, headroom, sector,
+                )
+                size_pct = headroom
+                review["verdict"] = "RESIZED"
+
+            # Rule D: CRISIS halving. The sizer defers to us whenever a review
+            # exists, so this is the single place the regime haircut is applied.
+            if regime == "CRISIS":
+                size_pct *= 0.5
+                review["verdict"] = "RESIZED"
+                logger.info("HARD RULE: %s halved to %.2f%% (CRISIS regime)", symbol, size_pct)
+
+            review["adjusted_size_pct"] = round(size_pct, 4)
+            sector_exposure[sector] = current + size_pct
+            enforced.append(review)
+
+        return enforced
 
     def _compute_risk_metrics(
         self,
@@ -191,13 +323,17 @@ Be conservative — protecting capital is your primary mandate. JSON only."""
             if not placed:
                 sector_exposure["other"] += pct
 
-        # Current drawdown
-        drawdown = metrics.get("max_drawdown", 0)
+        # Drawdown. The 3% hard rule is a DAILY limit, so it must use the
+        # day-scoped figure — max_drawdown spans the whole curve and only grows,
+        # which would latch the rule on permanently once tripped.
+        daily_drawdown = performance_tracker.compute_daily_drawdown()
+        max_drawdown = metrics.get("max_drawdown", 0)
 
         return {
             "daily_pnl": daily_pnl,
             "daily_pnl_pct": daily_pnl_pct,
-            "current_drawdown_pct": drawdown,
+            "current_drawdown_pct": daily_drawdown,
+            "max_drawdown_pct": max_drawdown,
             "position_count": len(positions),
             "sector_exposure": sector_exposure,
         }

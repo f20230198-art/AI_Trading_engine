@@ -1,0 +1,2170 @@
+{
+ "00fe5e9bde52aeff39c49a1b457e7db1be9a6d9f9db6f27550fa142c8c6aa86c": {
+  "latency_ms": 1095.6,
+  "response": "{\n  \"answer\": \"END_OF_TEST: 4 trades\\nSTOP_LOSS: 75 trades\\nTAKE_PROFIT: 49 trades\\nTIME_EXIT: 53 trades\",\n  \"insight\": \"The majority of trades (75) were closed due to STOP_LOSS, indicating a potential need to review risk management settings. TAKE_PROFIT and TIME_EXIT together account for over half of the remaining closures, suggesting that profit targets and time-based exits are also significant factors.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"exit_reason\",\n    \"y\": \"trades\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.755607556,
+   "completion_tokens": 235,
+   "completion_tokens_details": {
+    "reasoning_tokens": 97
+   },
+   "prompt_time": 0.010985145,
+   "prompt_tokens": 498,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244672986,
+   "total_time": 0.766592701,
+   "total_tokens": 733
+  }
+ },
+ "06fc947953756e18fdf2a16f79d4226e07f6197d28200f5e8f931415f8100870": {
+  "latency_ms": 1202.0,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(SUM(costs), 2) AS total_costs FROM trades\"\n}",
+  "usage": {
+   "completion_time": 0.468448448,
+   "completion_tokens": 223,
+   "completion_tokens_details": {
+    "reasoning_tokens": 178
+   },
+   "prompt_time": 0.006303466,
+   "prompt_tokens": 2379,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.332865023,
+   "total_time": 0.474751914,
+   "total_tokens": 2602
+  }
+ },
+ "075da59409fb4bd94dbdfab0bc63f01806ee12b28b9d15f5202ca7c4f274af4c": {
+  "latency_ms": 1051.0,
+  "response": "{\n  \"answer\": \"Month\u2011wise total P&L for 2026:\\n- 2026-01: -21.37\\n- 2026-02: 602.79\\n- 2026-03: 213.98\\n- 2026-04: 2,988.47\\n- 2026-05: 60.34\\n- 2026-06: -360.43\\n- 2026-07: 1,248.57\\n- 2026-08: 495.84\\n- 2026-09: -266.75\",\n  \"insight\": \"Profit was positive in most months, with a peak in April of 2,988.47. However, losses in January, June, and September show that performance was still volatile.\",\n  \"chart\": {\n    \"type\": \"line\",\n    \"x\": \"exit_month\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.781477636,
+   "completion_tokens": 374,
+   "completion_tokens_details": {
+    "reasoning_tokens": 159
+   },
+   "prompt_time": 0.028088915,
+   "prompt_tokens": 613,
+   "queue_time": 0.200575779,
+   "total_time": 0.809566551,
+   "total_tokens": 987
+  }
+ },
+ "0ec9819092936fa61087eabc22fa5c326354c31a0d087eac5edd6475742ae802": {
+  "latency_ms": 641.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT trades FROM perf_by_month WHERE exit_month = '2024-12';\"\n}",
+  "usage": {
+   "completion_time": 0.330723095,
+   "completion_tokens": 160,
+   "completion_tokens_details": {
+    "reasoning_tokens": 115
+   },
+   "prompt_time": 0.006088388,
+   "prompt_tokens": 2380,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244824755,
+   "total_time": 0.336811483,
+   "total_tokens": 2540
+  }
+ },
+ "0f41352d436f02ef9b25deb38493f6d9cf2bc4a285cbac1bfcaa7d342ca2bc36": {
+  "latency_ms": 945.1,
+  "response": "{\n  \"answer\": \"The financials stock with the highest total profit is WFC, with a total P&L of 1328.85.\",\n  \"insight\": \"WFC generated the greatest total profit among financials stocks in the data, indicating it outperformed its sector peers. This strong performance suggests it may be a priority for investment focus or deeper analysis.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.448798273,
+   "completion_tokens": 217,
+   "completion_tokens_details": {
+    "reasoning_tokens": 106
+   },
+   "prompt_time": 0.010847066,
+   "prompt_tokens": 477,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380634046,
+   "total_time": 0.459645339,
+   "total_tokens": 694
+  }
+ },
+ "13707ce95a461880d9b9fdabeb558fcc023a06b89cb5c5b3e9b944f8352c876f": {
+  "latency_ms": 1498.9,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT strategy, ROUND(AVG(pnl_pct), 2) AS avg_return_pct FROM trades WHERE status = 'closed' GROUP BY strategy\"\n}",
+  "usage": {
+   "completion_time": 0.473081883,
+   "completion_tokens": 220,
+   "completion_tokens_details": {
+    "reasoning_tokens": 163
+   },
+   "prompt_time": 0.012015393,
+   "prompt_tokens": 2381,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.299157128,
+   "total_time": 0.485097276,
+   "total_tokens": 2601
+  }
+ },
+ "179e8a54c46006c87c4008b3e739b161785040d195b39bfc93814e9256973c39": {
+  "latency_ms": 744.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(SUM(pnl), 2) AS total_pnl_2025 FROM trades WHERE status = 'closed' AND substr(exit_date, 1, 4) = '2025'\"\n}",
+  "usage": {
+   "completion_time": 0.348453609,
+   "completion_tokens": 167,
+   "completion_tokens_details": {
+    "reasoning_tokens": 98
+   },
+   "prompt_time": 0.141502977,
+   "prompt_tokens": 2384,
+   "queue_time": 0.193877244,
+   "total_time": 0.489956586,
+   "total_tokens": 2551
+  }
+ },
+ "1a8a1777316ed7572371a3f9642b4c314cf723a8c2901afbb0d2b007a88d23d4": {
+  "latency_ms": 1187.3,
+  "response": "{\n  \"answer\": \"Average P&L per trade by exit reason:\\n- END_OF_TEST: -43.74\\n- STOP_LOSS: -144.11\\n- TAKE_PROFIT: 337.33\\n- TIME_EXIT: 88.85\",\n  \"insight\": \"Trades that exit on TAKE_PROFIT generate a strong positive average profit, while STOP_LOSS exits lose heavily on average. TIME_EXIT yields modest gains and END_OF_TEST results in a small loss, indicating room to improve exit strategies.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"exit_reason\",\n    \"y\": \"avg_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.686212061,
+   "completion_tokens": 329,
+   "completion_tokens_details": {
+    "reasoning_tokens": 180
+   },
+   "prompt_time": 0.019663897,
+   "prompt_tokens": 494,
+   "queue_time": 0.388829636,
+   "total_time": 0.705875958,
+   "total_tokens": 823
+  }
+ },
+ "20c1730b317cb88ac13fa84d07c70a6da73a87c2c3b957d59b3d49ab0d32ebba": {
+  "latency_ms": 848.8,
+  "response": "{\n  \"answer\": \"1. financials \u2013 1.8%\\n2. energy \u2013 1.49%\\n3. technology \u2013 1.27%\",\n  \"insight\": \"Financials generate the highest average return per trade, with energy and technology trailing behind. Prioritizing trades in the financial sector could boost overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"avg_return_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.581329684,
+   "completion_tokens": 276,
+   "completion_tokens_details": {
+    "reasoning_tokens": 164
+   },
+   "prompt_time": 0.020752543,
+   "prompt_tokens": 504,
+   "queue_time": 0.190938445,
+   "total_time": 0.602082227,
+   "total_tokens": 780
+  }
+ },
+ "22aea1ca3cd7c4a3dd05611b7726fbf07881e2ab3c3118f3572d732a71a1a3cc": {
+  "latency_ms": 1305.9,
+  "response": "{\n  \"answer\": \"The month with the highest total P&L is 2025-04, with a total P&L of 3861.58.\",\n  \"insight\": \"April 2025 delivered the peak P&L of $3,861.58, indicating a strong performance period. Analyzing the factors that contributed to this peak could help replicate the success in future months.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.539406983,
+   "completion_tokens": 261,
+   "completion_tokens_details": {
+    "reasoning_tokens": 143
+   },
+   "prompt_time": 0.018349361,
+   "prompt_tokens": 446,
+   "queue_time": 0.380814467,
+   "total_time": 0.557756344,
+   "total_tokens": 707
+  }
+ },
+ "281e1a12428a42396383351ececa0fa7f5480a5c5cd898e883ec69fd5ab4fc4a": {
+  "latency_ms": 944.4,
+  "response": "{\n  \"answer\": \"The total realized P&L across all closed trades is $10,255.17.\",\n  \"insight\": \"Closed trades have produced a positive profit of roughly $10.3k, indicating overall profitability. This result can be used to assess the effectiveness of current trading strategies.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.589199558,
+   "completion_tokens": 284,
+   "completion_tokens_details": {
+    "reasoning_tokens": 185
+   },
+   "prompt_time": 0.020365667,
+   "prompt_tokens": 465,
+   "queue_time": 0.244151483,
+   "total_time": 0.609565225,
+   "total_tokens": 749
+  }
+ },
+ "29653ef7cd8e508ce71f03ebbed820bd609310981d660f67bc5e2f7455c15fda": {
+  "latency_ms": 899.2,
+  "response": "{\n  \"answer\": \"Win rate by market regime at trade entry:\\n- HIGH_VOLATILITY: 83.3%\\n- RANGING: 50.0%\\n- TRENDING: 59.2%\",\n  \"insight\": \"The strategy performs best during high volatility periods, achieving an 83.3% win rate. Win rates are lower in ranging (50.0%) and trending (59.2%) regimes, suggesting opportunities to improve performance in those market conditions.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"entry_regime\",\n    \"y\": \"win_rate_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.542043912,
+   "completion_tokens": 262,
+   "completion_tokens_details": {
+    "reasoning_tokens": 116
+   },
+   "prompt_time": 0.019563787,
+   "prompt_tokens": 479,
+   "queue_time": 0.299750185,
+   "total_time": 0.561607699,
+   "total_tokens": 741
+  }
+ },
+ "2c0beb70fe47814016c97d13fe26b03b861060bd5b1c49901b597115e601f513": {
+  "latency_ms": 938.2,
+  "response": "{\n  \"answer\": \"The win rate of momentum trades in technology stocks was 27.27%.\",\n  \"insight\": \"Only about a quarter of momentum trades in the technology sector were profitable, indicating a relatively low success rate. This suggests the momentum strategy may require review or adjustment to improve its effectiveness.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.460838629,
+   "completion_tokens": 203,
+   "completion_tokens_details": {
+    "reasoning_tokens": 103
+   },
+   "prompt_time": 0.010939703,
+   "prompt_tokens": 512,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380962722,
+   "total_time": 0.471778332,
+   "total_tokens": 715
+  }
+ },
+ "2c2287256ecb57b2b8f16d2905f218b5c152de72a6922961aae8d8ce1d27978b": {
+  "latency_ms": 1327.0,
+  "response": "{\n  \"answer\": \"The maximum drawdown was 1.95%.\",\n  \"insight\": \"The backtest experienced a relatively small maximum drawdown of 1.95%, indicating limited downside risk during the period. This suggests the strategy maintained stable equity levels, which could be attractive to risk\u2011averse investors.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.730905545,
+   "completion_tokens": 352,
+   "completion_tokens_details": {
+    "reasoning_tokens": 250
+   },
+   "prompt_time": 0.023284652,
+   "prompt_tokens": 461,
+   "queue_time": 0.380800762,
+   "total_time": 0.754190197,
+   "total_tokens": 813
+  }
+ },
+ "2c8d0408b572c34f3caa1bd7bd2f0128b082ad667269547b61c882408235fbeb": {
+  "latency_ms": 983.6,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The database does not contain P/E ratio information for any ticker, including Tesla.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.192052688,
+   "completion_tokens": 92,
+   "completion_tokens_details": {
+    "reasoning_tokens": 48
+   },
+   "prompt_time": 0.1182791,
+   "prompt_tokens": 2378,
+   "queue_time": 0.585909189,
+   "total_time": 0.310331788,
+   "total_tokens": 2470
+  }
+ },
+ "2d9dcf1bcbd5db307ff97c01287da000a5be41a36c6bb875b7049c31531cd9da": {
+  "latency_ms": 525.4,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The database does not contain any news headline data, so the question cannot be answered with the available tables and views.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.224597021,
+   "completion_tokens": 109,
+   "completion_tokens_details": {
+    "reasoning_tokens": 58
+   },
+   "prompt_time": 0.005817903,
+   "prompt_tokens": 2378,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244603077,
+   "total_time": 0.230414924,
+   "total_tokens": 2487
+  }
+ },
+ "2dcc29b77f9a429ac98eee13094b12b93b96b02c270df85356dab7326e4949b7": {
+  "latency_ms": 1620.7,
+  "response": "{\n  \"answer\": \"AAPL: 1158.42\\nAMZN: 140.49\\nAVGO: -128.9\\nBAC: 129.36\\nBLK: 580.57\\nCOP: 633.96\\nCVX: 62.04\\nEOG: 284.77\\nGOOGL: 913.08\\nGS: 908.95\\nJPM: 444.91\\nMETA: 1265.15\\nMPC: 1394.87\\nMS: 761.25\\nMSFT: -94.85\\nNVDA: 207.66\\nPSX: 281.41\\nSCHW: 299.0\\nSLB: -331.58\\nTSM: 142.36\\nWFC: 1328.85\\nXOM: -126.6\",\n  \"insight\": \"Most symbols generated positive P&L, with MPC leading at 1394.87 and SLB showing the largest loss at -331.58. The mix of gains and losses suggests selective performance across the portfolio.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.910978536,
+   "completion_tokens": 439,
+   "completion_tokens_details": {
+    "reasoning_tokens": 168
+   },
+   "prompt_time": 0.053393085,
+   "prompt_tokens": 822,
+   "queue_time": 0.380564917,
+   "total_time": 0.964371621,
+   "total_tokens": 1261
+  }
+ },
+ "2e7a1d6cee829106bf227fb0c0230937ec3107572a09f81f577877cd7a7b40e5": {
+  "latency_ms": 741.2,
+  "response": "{\n  \"answer\": \"The financials stock with the highest total profit is WFC, with a total PnL of 1328.85.\",\n  \"insight\": \"WFC generated the greatest total profit among financial sector stocks, highlighting its strong performance relative to peers. This may warrant closer attention for investment or further analysis.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.429488249,
+   "completion_tokens": 204,
+   "completion_tokens_details": {
+    "reasoning_tokens": 98
+   },
+   "prompt_time": 0.018213049,
+   "prompt_tokens": 445,
+   "queue_time": 0.245057544,
+   "total_time": 0.447701298,
+   "total_tokens": 649
+  }
+ },
+ "33ee20ead0acc4346ef454e6b306087ba9ac5e015d582180ce7538311738912f": {
+  "latency_ms": 545.5,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"That is a prediction about the future; the database only holds historical records.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.185021809,
+   "completion_tokens": 90,
+   "completion_tokens_details": {
+    "reasoning_tokens": 47
+   },
+   "prompt_time": 0.005800961,
+   "prompt_tokens": 2380,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.298975133,
+   "total_time": 0.19082277,
+   "total_tokens": 2470
+  }
+ },
+ "34242245a588e13fa7f2e4aa36c7104b2f6a8d9126a04fe6e2866000edafb7e3": {
+  "latency_ms": 1153.0,
+  "response": "{\n  \"answer\": \"The MEAN_REVERSION strategy has a win rate of 55.97%, whereas the MOMENTUM strategy has a win rate of 36.36%.\",\n  \"insight\": \"MEAN_REVERSION delivers a substantially higher win rate, suggesting it may be more effective for current trading conditions. The lower win rate of MOMENTUM indicates it may require strategy adjustments or risk mitigation.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"win_rate_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.755735284,
+   "completion_tokens": 363,
+   "completion_tokens_details": {
+    "reasoning_tokens": 238
+   },
+   "prompt_time": 0.020769244,
+   "prompt_tokens": 467,
+   "queue_time": 0.330129289,
+   "total_time": 0.776504528,
+   "total_tokens": 830
+  }
+ },
+ "36bbe434eaed51cd4e80ae20f40ef9c9673849ac97cd34b709b94081c1bdfc8f": {
+  "latency_ms": 880.6,
+  "response": "{\n  \"answer\": \"36 trades were opened in the first quarter of 2026.\",\n  \"insight\": \"The volume of trades in Q1 2026 indicates a moderate level of market activity. This figure can be used as a baseline to compare future quarterly performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.435177149,
+   "completion_tokens": 210,
+   "completion_tokens_details": {
+    "reasoning_tokens": 117
+   },
+   "prompt_time": 0.062283964,
+   "prompt_tokens": 450,
+   "queue_time": 0.333000679,
+   "total_time": 0.497461113,
+   "total_tokens": 660
+  }
+ },
+ "3a37b2dbe1fd3b24c27167ff834ef097e1bfc571caa6c50f8aaa524ef23f5e94": {
+  "latency_ms": 787.0,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"That is a prediction about the future and a request for investment advice; the database only holds historical records.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.22061344,
+   "completion_tokens": 106,
+   "completion_tokens_details": {
+    "reasoning_tokens": 57
+   },
+   "prompt_time": 0.122812628,
+   "prompt_tokens": 2376,
+   "queue_time": 0.381159665,
+   "total_time": 0.343426068,
+   "total_tokens": 2482
+  }
+ },
+ "3cb4f3138c7651c3e0e5db09a9008d71cf0612babd41df6889ffb364f10d1108": {
+  "latency_ms": 1299.1,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(MAX(drawdown_pct), 2) AS max_drawdown_pct FROM drawdowns\"\n}",
+  "usage": {
+   "completion_time": 0.268413349,
+   "completion_tokens": 130,
+   "completion_tokens_details": {
+    "reasoning_tokens": 83
+   },
+   "prompt_time": 0.562829772,
+   "prompt_tokens": 2385,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.349656678,
+   "total_time": 0.831243121,
+   "total_tokens": 2515
+  }
+ },
+ "3ec942079a58b5addaccd369dc2b3320c3134baec70c7ac1fe1dcd0368d010a4": {
+  "latency_ms": 884.5,
+  "response": "{\n  \"answer\": \"IN-SAMPLE (2y)\",\n  \"insight\": \"The IN-SAMPLE (2y) validation window achieved the highest Sharpe ratio, indicating it provided the best risk\u2011adjusted return among the windows evaluated. This suggests that strategies validated in this window may be the most promising for future deployment.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.589878153,
+   "completion_tokens": 287,
+   "completion_tokens_details": {
+    "reasoning_tokens": 183
+   },
+   "prompt_time": 0.017111217,
+   "prompt_tokens": 421,
+   "queue_time": 0.244660809,
+   "total_time": 0.60698937,
+   "total_tokens": 708
+  }
+ },
+ "3fef9e25827740c72e1d0ae25af2e43ba29e48032d85d1acdda18c672dd44aee": {
+  "latency_ms": 827.7,
+  "response": "{\n  \"answer\": \"The overall win rate of our closed trades is 53.59%.\",\n  \"insight\": \"Just over half of the closed trades were profitable, showing a modest edge in trading performance. There remains significant opportunity to improve the win rate for greater overall profitability.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.415211629,
+   "completion_tokens": 200,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   },
+   "prompt_time": 0.018744457,
+   "prompt_tokens": 481,
+   "queue_time": 0.299274016,
+   "total_time": 0.433956086,
+   "total_tokens": 681
+  }
+ },
+ "423dd8724dd5748e6f72d1ff0318350d52e00eeb8facf9be71e37f287a6de445": {
+  "latency_ms": 945.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT COUNT(*) AS trade_count FROM trades\"\n}",
+  "usage": {
+   "completion_time": 0.212491325,
+   "completion_tokens": 102,
+   "completion_tokens_details": {
+    "reasoning_tokens": 65
+   },
+   "prompt_time": 0.123885,
+   "prompt_tokens": 2377,
+   "queue_time": 0.299322176,
+   "total_time": 0.336376325,
+   "total_tokens": 2479
+  }
+ },
+ "442508d95b48a3671b3ae7f09e5528a208152680503fa5804c184705dcb37a0d": {
+  "latency_ms": 1060.4,
+  "response": "{\n  \"answer\": \"The MEAN_REVERSION strategy achieved the highest total P&L on trades entered in a RANGING regime, with a total P&L of 3175.0.\",\n  \"insight\": \"MEAN_REVERSION generated the greatest profit among RANGING regime trades, indicating it is the most effective strategy in such market conditions. Prioritizing this strategy could enhance overall profitability when markets are ranging.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.704300826,
+   "completion_tokens": 338,
+   "completion_tokens_details": {
+    "reasoning_tokens": 213
+   },
+   "prompt_time": 0.021830287,
+   "prompt_tokens": 500,
+   "queue_time": 0.244823569,
+   "total_time": 0.726131113,
+   "total_tokens": 838
+  }
+ },
+ "464481e0166150866c5618e3a6b27387a2a45e7427f58cbf33a48553bfcf3748": {
+  "latency_ms": 1107.7,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The request asks for a natural language summary of free-text reasoning from the conflict log, which cannot be produced by a single read\u2011only SELECT query.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.632755017,
+   "completion_tokens": 304,
+   "completion_tokens_details": {
+    "reasoning_tokens": 246
+   },
+   "prompt_time": 0.007006255,
+   "prompt_tokens": 2381,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.381087336,
+   "total_time": 0.639761272,
+   "total_tokens": 2685
+  }
+ },
+ "465f49815662c8c6a74d6718a63dbf567d68f8ba5ade5f93d8633c69cb78f6ac": {
+  "latency_ms": 850.3,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT sector, ROUND(AVG(holding_days), 1) AS avg_holding_days FROM trades_enriched WHERE holding_days IS NOT NULL GROUP BY sector\"\n}",
+  "usage": {
+   "completion_time": 0.393121495,
+   "completion_tokens": 189,
+   "completion_tokens_details": {
+    "reasoning_tokens": 129
+   },
+   "prompt_time": 0.005257688,
+   "prompt_tokens": 2381,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.381124223,
+   "total_time": 0.398379183,
+   "total_tokens": 2570
+  }
+ },
+ "4ca0676f8ed7b19e6095888ff269bb7bdf6b96d4387a32882d8a794165ace561": {
+  "latency_ms": 994.8,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(SUM(pnl), 2) AS total_pnl FROM trades_enriched WHERE sector = 'energy' AND exit_reason = 'TAKE_PROFIT'\"\n}",
+  "usage": {
+   "completion_time": 0.634985937,
+   "completion_tokens": 298,
+   "completion_tokens_details": {
+    "reasoning_tokens": 236
+   },
+   "prompt_time": 0.005346721,
+   "prompt_tokens": 2385,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.298840675,
+   "total_time": 0.640332658,
+   "total_tokens": 2683
+  }
+ },
+ "4fef8cf5dfec8b7b57fa27ac11b8856e7691064fee1b417e34d8cb2fdb3aeeda": {
+  "latency_ms": 848.7,
+  "response": "{\n  \"answer\": \"The total P&L of trades opened during a TRENDING regime was $6,493.69.\",\n  \"insight\": \"Trades under the TRENDING regime produced a positive profit of roughly $6.5k, indicating profitability for that strategy. This suggests the TRENDING regime contributed positively to overall performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.483307115,
+   "completion_tokens": 230,
+   "completion_tokens_details": {
+    "reasoning_tokens": 122
+   },
+   "prompt_time": 0.009079854,
+   "prompt_tokens": 440,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.298476973,
+   "total_time": 0.492386969,
+   "total_tokens": 670
+  }
+ },
+ "5260c22058970c89a43f6e95905de783ff82a21002f4b5c1adccd6053d764e77": {
+  "latency_ms": 2233.6,
+  "response": "{\n  \"answer\": \"The total P&L for closed trades is $10,255.17.\",\n  \"insight\": \"The business generated a positive profit of $10,255.17 from closed trades, indicating profitability in current operations. However, without comparison to targets or prior periods, it\u2019s unclear how this performance stacks up against expectations.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.840191537,
+   "completion_tokens": 401,
+   "completion_tokens_details": {
+    "reasoning_tokens": 293
+   },
+   "prompt_time": 0.976285642,
+   "prompt_tokens": 431,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380923621,
+   "total_time": 1.816477179,
+   "total_tokens": 832
+  }
+ },
+ "59a7db677bbb38ab582844fce1449d92d04ef857bada635ccc8a33ba6fbfca32": {
+  "latency_ms": 1001.2,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(100.0 * SUM(CASE WHEN pnl > 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS win_rate_pct FROM trades WHERE status = 'closed'\"\n}",
+  "usage": {
+   "completion_time": 0.41120793,
+   "completion_tokens": 199,
+   "completion_tokens_details": {
+    "reasoning_tokens": 129
+   },
+   "prompt_time": 0.190010097,
+   "prompt_tokens": 2382,
+   "queue_time": 0.244914116,
+   "total_time": 0.601218027,
+   "total_tokens": 2581
+  }
+ },
+ "5d0445bb423f229a18b0b2c6bf4568c162c3d9edc613cb6d2fbc2acfc4034e77": {
+  "latency_ms": 1193.3,
+  "response": "{\n  \"answer\": \"The three symbols with the largest total losses are SLB (\u2011$331.58), AVGO (\u2011$128.90), and XOM (\u2011$126.60).\",\n  \"insight\": \"These symbols are the biggest contributors to negative P&L, indicating underperformance that may require review. Reducing exposure to these underperformers could improve overall portfolio profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.904198232,
+   "completion_tokens": 359,
+   "completion_tokens_details": {
+    "reasoning_tokens": 235
+   },
+   "prompt_time": 0.011176847,
+   "prompt_tokens": 471,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244524918,
+   "total_time": 0.915375079,
+   "total_tokens": 830
+  }
+ },
+ "5d1d09acd006f590d16e90f5d9690dee08ce141ea309c1e900bdc64ef6f161fb": {
+  "latency_ms": 820.0,
+  "response": "{\n  \"answer\": \"The largest profit made on a single closed trade was $517.25.\",\n  \"insight\": \"The peak profit of $517.25 shows the best possible outcome from a single trade, highlighting the upside potential. However, without additional context on frequency, it may represent an outlier rather than a typical result.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.437408581,
+   "completion_tokens": 210,
+   "completion_tokens_details": {
+    "reasoning_tokens": 104
+   },
+   "prompt_time": 0.02033729,
+   "prompt_tokens": 424,
+   "queue_time": 0.309226721,
+   "total_time": 0.457745871,
+   "total_tokens": 634
+  }
+ },
+ "5f6466c323ede0976ae0f5a41f497d24585981336d63c54b57c1003bed04f0e9": {
+  "latency_ms": 1070.1,
+  "response": "{\n  \"answer\": \"The MEAN_REVERSION strategy has a win rate of 55.97%, while the MOMENTUM strategy has a win rate of 36.36%. MEAN_REVERSION performs better in terms of win rate.\",\n  \"insight\": \"MEAN_REVERSION\u2019s win rate is roughly 20 percentage points higher than MOMENTUM\u2019s, indicating stronger trade success for that approach. Prioritizing or expanding the MEAN_REVERSION strategy could improve overall performance.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"win_rate_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.568226359,
+   "completion_tokens": 274,
+   "completion_tokens_details": {
+    "reasoning_tokens": 134
+   },
+   "prompt_time": 0.121340346,
+   "prompt_tokens": 499,
+   "queue_time": 0.325318849,
+   "total_time": 0.689566705,
+   "total_tokens": 773
+  }
+ },
+ "6063072f75a698cae0ba5e4bd0a365ce884379cc77088d2cceb47809504ac29a": {
+  "latency_ms": 980.5,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The request is to modify or copy data to an external database, which is not allowed. Only read-only SELECT queries over the provided schema are permitted.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.22343163,
+   "completion_tokens": 107,
+   "completion_tokens_details": {
+    "reasoning_tokens": 46
+   },
+   "prompt_time": 0.281644906,
+   "prompt_tokens": 2392,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.381364407,
+   "total_time": 0.505076536,
+   "total_tokens": 2499
+  }
+ },
+ "6717b3558816dd7d729c9c289ba4957ac18b3be4b582358f8bff8d383ad5aefb": {
+  "latency_ms": 824.5,
+  "response": "{\n  \"answer\": \"Average holding period (days) by sector: Energy\u202f=\u202f11.6, Financials\u202f=\u202f12.1, Technology\u202f=\u202f9.2.\",\n  \"insight\": \"Financials have the longest average holding period, suggesting positions are held slightly longer in that sector. Technology\u2019s shorter average indicates faster turnover, which may reflect higher trading activity or quicker profit realization.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"avg_holding_days\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.530707647,
+   "completion_tokens": 223,
+   "completion_tokens_details": {
+    "reasoning_tokens": 98
+   },
+   "prompt_time": 0.010427801,
+   "prompt_tokens": 479,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.245454036,
+   "total_time": 0.541135448,
+   "total_tokens": 702
+  }
+ },
+ "6bcfc1be96e6e81a4f75dbb20492b226ba940b0948bbcddb0b9ec23f021b07da": {
+  "latency_ms": 835.3,
+  "response": "{\n  \"answer\": \"12 trades were closed in December 2024.\",\n  \"insight\": \"The data shows that 12 trades were closed in December 2024. This reflects the total trading activity for that month.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.422185816,
+   "completion_tokens": 195,
+   "completion_tokens_details": {
+    "reasoning_tokens": 114
+   },
+   "prompt_time": 0.010986749,
+   "prompt_tokens": 450,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.299000003,
+   "total_time": 0.433172565,
+   "total_tokens": 645
+  }
+ },
+ "6d09430ae2a5d4bcb7f949dd1127ef8b72392790a9bf678aa172e171518dbca3": {
+  "latency_ms": 1052.1,
+  "response": "{\n  \"answer\": \"RANGING: 313 days, TRENDING: 119 days, HIGH_VOLATILITY: 19 days.\",\n  \"insight\": \"The majority of trading days (313) fell under the RANGING regime, indicating a relatively stable market environment. High volatility days were rare (19), suggesting limited periods of extreme market swings.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"regime\",\n    \"y\": \"days\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.809768133,
+   "completion_tokens": 294,
+   "completion_tokens_details": {
+    "reasoning_tokens": 179
+   },
+   "prompt_time": 0.01109535,
+   "prompt_tokens": 456,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.191062917,
+   "total_time": 0.820863483,
+   "total_tokens": 750
+  }
+ },
+ "6ebaeff41e3caef744b5067769926a276eb7697ee706098d91b2db26c2aee330": {
+  "latency_ms": 969.6,
+  "response": "{\n  \"answer\": \"HIGH_VOLATILITY: 19 days, RANGING: 313 days, TRENDING: 119 days.\",\n  \"insight\": \"The market spent most of its time in a ranging regime (313 days), indicating relatively stable price action. High volatility and trending regimes were less common, with only 19 and 119 days respectively, suggesting limited periods of rapid movement.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"regime\",\n    \"y\": \"days\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.596918354,
+   "completion_tokens": 285,
+   "completion_tokens_details": {
+    "reasoning_tokens": 162
+   },
+   "prompt_time": 0.021077861,
+   "prompt_tokens": 488,
+   "queue_time": 0.298026402,
+   "total_time": 0.617996215,
+   "total_tokens": 773
+  }
+ },
+ "7043afa18d18280d12b2a864c537b1be518e835f4a07b552149757220a2b055e": {
+  "latency_ms": 850.5,
+  "response": "{\n  \"answer\": \"The total trading costs were $362.0.\",\n  \"insight\": \"All trades combined incurred $362 in costs, representing the overall expense for the period covered. This figure can be used as a baseline for budgeting and cost\u2011control initiatives.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.375924485,
+   "completion_tokens": 183,
+   "completion_tokens_details": {
+    "reasoning_tokens": 93
+   },
+   "prompt_time": 0.020042531,
+   "prompt_tokens": 452,
+   "queue_time": 0.391076646,
+   "total_time": 0.395967016,
+   "total_tokens": 635
+  }
+ },
+ "723b71623b8f27e00221b593f32256a538261657bacb44d944504a8e5c1d1e27": {
+  "latency_ms": 1739.2,
+  "response": "{\n  \"answer\": \"The total P&L for trades opened during a TRENDING regime is $6,493.69.\",\n  \"insight\": \"Trades opened under the TRENDING regime produced a positive P&L of $6,493.69, indicating profitability for that regime. This suggests the TRENDING entry strategy contributed positively to overall performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.509185805,
+   "completion_tokens": 232,
+   "completion_tokens_details": {
+    "reasoning_tokens": 122
+   },
+   "prompt_time": 0.009467667,
+   "prompt_tokens": 472,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 1.160686007,
+   "total_time": 0.518653472,
+   "total_tokens": 704
+  }
+ },
+ "73ccb9963b71a0d5b49900e0c2f36efc8852fb9af1a836c2593cce695f478264": {
+  "latency_ms": 1090.3,
+  "response": "{\n  \"answer\": \"The average P&L per trade for RANGING entries is $22.91, while for TRENDING entries it is $132.52.\",\n  \"insight\": \"Trades entered under the TRENDING regime generate substantially higher average profit and loss per trade than those entered under the RANGING regime. Focusing on TRENDING entries could improve overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"entry_regime\",\n    \"y\": \"avg_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.733460269,
+   "completion_tokens": 337,
+   "completion_tokens_details": {
+    "reasoning_tokens": 213
+   },
+   "prompt_time": 0.079212435,
+   "prompt_tokens": 493,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244992709,
+   "total_time": 0.812672704,
+   "total_tokens": 830
+  }
+ },
+ "7439048b3f07e192e9f6ab903bc4bd2dfa4edbbefe7c4dc29333599ed2d8d6fe": {
+  "latency_ms": 1620.2,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT entry_regime,\\n       ROUND(AVG(pnl), 2) AS avg_pnl\\nFROM trades_enriched\\nWHERE entry_regime IN ('RANGING', 'TRENDING')\\n  AND exit_date IS NOT NULL\\nGROUP BY entry_regime\"\n}",
+  "usage": {
+   "completion_time": 1.318112825,
+   "completion_tokens": 371,
+   "completion_tokens_details": {
+    "reasoning_tokens": 283
+   },
+   "prompt_time": 0.007024588,
+   "prompt_tokens": 2390,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244166351,
+   "total_time": 1.325137413,
+   "total_tokens": 2761
+  }
+ },
+ "75a07860c830977e69e62b50a6af73ae24998cad6a686917a65994ba2dcd2d52": {
+  "latency_ms": 1304.9,
+  "response": "{\n  \"answer\": \"The average P&L per trade is $22.91 for RANGING regimes and $132.52 for TRENDING regimes.\",\n  \"insight\": \"TRENDING regimes generate a much higher average profit per trade than RANGING regimes. Prioritizing trades entered under TRENDING conditions could boost overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"entry_regime\",\n    \"y\": \"avg_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.634359376,
+   "completion_tokens": 225,
+   "completion_tokens_details": {
+    "reasoning_tokens": 110
+   },
+   "prompt_time": 0.200211825,
+   "prompt_tokens": 525,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244163078,
+   "total_time": 0.834571201,
+   "total_tokens": 750
+  }
+ },
+ "75aaa737e292f959b68e6b6e38985ddb01f9eb7a447a999bb3fccb33c8be140f": {
+  "latency_ms": 878.4,
+  "response": "{\n  \"answer\": \"MEAN_REVERSION: 1.8%, MOMENTUM: -0.6%\",\n  \"insight\": \"The MEAN_REVERSION strategy generated a positive average return of 1.8% per trade, while the MOMENTUM strategy produced a negative average return of -0.6% per trade. This suggests that, on average, MEAN_REVERSION is currently more profitable than MOMENTUM.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"avg_return_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.450217663,
+   "completion_tokens": 219,
+   "completion_tokens_details": {
+    "reasoning_tokens": 88
+   },
+   "prompt_time": 0.073584559,
+   "prompt_tokens": 494,
+   "queue_time": 0.257479061,
+   "total_time": 0.523802222,
+   "total_tokens": 713
+  }
+ },
+ "77685f32a9fb794df3b2b48d5d0a105a090d9f336c6815752f77b1ac0deb5747": {
+  "latency_ms": 692.8,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The request asks to modify the database by dropping a table, which is not allowed. Only read-only SELECT queries are permitted.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.204616528,
+   "completion_tokens": 99,
+   "completion_tokens_details": {
+    "reasoning_tokens": 46
+   },
+   "prompt_time": 0.101486399,
+   "prompt_tokens": 2383,
+   "queue_time": 0.330661099,
+   "total_time": 0.306102927,
+   "total_tokens": 2482
+  }
+ },
+ "783f58eb5ae3c3995a02a11aa0c08bffb5c615efaf462d40c0e29200d40e48dd": {
+  "latency_ms": 1181.5,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_symbol\"\n}",
+  "usage": {
+   "completion_time": 0.714585013,
+   "completion_tokens": 200,
+   "completion_tokens_details": {
+    "reasoning_tokens": 152
+   },
+   "prompt_time": 0.005401194,
+   "prompt_tokens": 2382,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.381136591,
+   "total_time": 0.719986207,
+   "total_tokens": 2582
+  }
+ },
+ "7a24d31757e712bbaef41359992e57d31c49ced74686cc1b55b73970fc47b61d": {
+  "latency_ms": 947.7,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT exit_month, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_month WHERE exit_month LIKE '2026-%' ORDER BY exit_month\"\n}",
+  "usage": {
+   "completion_time": 0.479710993,
+   "completion_tokens": 202,
+   "completion_tokens_details": {
+    "reasoning_tokens": 137
+   },
+   "prompt_time": 0.026347571,
+   "prompt_tokens": 2383,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.381358475,
+   "total_time": 0.506058564,
+   "total_tokens": 2585
+  }
+ },
+ "7c85f04ea6c8438274d8f9023b6bea6f0ad3b518837ea51f754d8c0aaa8f64a5": {
+  "latency_ms": 937.8,
+  "response": "{\n  \"answer\": \"The total P&L on trades closed in 2025 was $6,816.96.\",\n  \"insight\": \"The firm realized a positive net profit of $6,816.96 from closed trades in 2025. This indicates that the trading activities for that year contributed positively to the bottom line.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.453444364,
+   "completion_tokens": 219,
+   "completion_tokens_details": {
+    "reasoning_tokens": 113
+   },
+   "prompt_time": 0.019000232,
+   "prompt_tokens": 487,
+   "queue_time": 0.380735871,
+   "total_time": 0.472444596,
+   "total_tokens": 706
+  }
+ },
+ "80328341d1eefae453e402aeb8add7f99af398c072ddfdf5826058be79bf1a2e": {
+  "latency_ms": 1142.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_symbol WHERE sector = 'financials' ORDER BY total_pnl DESC LIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.40299601,
+   "completion_tokens": 195,
+   "completion_tokens_details": {
+    "reasoning_tokens": 131
+   },
+   "prompt_time": 0.120027318,
+   "prompt_tokens": 2380,
+   "queue_time": 0.381442882,
+   "total_time": 0.523023328,
+   "total_tokens": 2575
+  }
+ },
+ "80467aaa1bf9be2d91da1fcd841c43f493923afd45346063315b334dc97915d0": {
+  "latency_ms": 831.7,
+  "response": "{\n  \"answer\": \"The total P&L from energy stocks that hit their take\u2011profit is 3330.21.\",\n  \"insight\": \"Energy sector trades that reached their take\u2011profit generated a positive profit of 3,330.21. This indicates that the take\u2011profit strategy is effective for energy stocks in the current dataset.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.488066038,
+   "completion_tokens": 216,
+   "completion_tokens_details": {
+    "reasoning_tokens": 108
+   },
+   "prompt_time": 0.00870976,
+   "prompt_tokens": 445,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.299002544,
+   "total_time": 0.496775798,
+   "total_tokens": 661
+  }
+ },
+ "82fe86f1f592fbc5a95e6a46e3d82d9c59990d31478cd145ae8d00eccdc3d4d6": {
+  "latency_ms": 841.0,
+  "response": "{\n  \"answer\": \"The portfolio equity on the last trading day of 2025 was $109,934.47.\",\n  \"insight\": \"The portfolio ended 2025 with roughly $110k in equity, establishing the baseline value for the year. This figure can be used to compare against future periods to assess growth or decline.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.428534819,
+   "completion_tokens": 203,
+   "completion_tokens_details": {
+    "reasoning_tokens": 97
+   },
+   "prompt_time": 0.11575528,
+   "prompt_tokens": 457,
+   "queue_time": 0.244761188,
+   "total_time": 0.544290099,
+   "total_tokens": 660
+  }
+ },
+ "8893e4bb6cc7fac438ca73cbeac3bbce7e16712a1ab6c02c43dca2c0d837e785": {
+  "latency_ms": 1193.2,
+  "response": "{\n  \"answer\": \"The month with the highest total P&L is 2025-04, with a total P&L of 3861.58.\",\n  \"insight\": \"April 2025 generated the strongest profitability among the periods analyzed. Understanding the factors that drove this peak could help replicate the performance in other months.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.723425836,
+   "completion_tokens": 349,
+   "completion_tokens_details": {
+    "reasoning_tokens": 245
+   },
+   "prompt_time": 0.010240879,
+   "prompt_tokens": 478,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.38055545,
+   "total_time": 0.733666715,
+   "total_tokens": 827
+  }
+ },
+ "8b59799ef195c293365b41fdd6f8667cb62da27ddb452d320cb9dffadf3bb2f0": {
+  "latency_ms": 966.0,
+  "response": "{\n  \"answer\": \"The total P&L from energy stocks that hit their take\u2011profit is $3,330.21.\",\n  \"insight\": \"Energy sector trades that exited via take\u2011profit generated a positive P&L of $3,330.21, showing that this exit strategy was profitable for that sector. Leveraging take\u2011profit targets on energy stocks could be a worthwhile focus for future trading decisions.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.516447678,
+   "completion_tokens": 249,
+   "completion_tokens_details": {
+    "reasoning_tokens": 126
+   },
+   "prompt_time": 0.010797616,
+   "prompt_tokens": 477,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380523895,
+   "total_time": 0.527245294,
+   "total_tokens": 726
+  }
+ },
+ "8ce35278c449baf64ad4e5b519b42b71e032060253434df894e1c5e11b0ad661": {
+  "latency_ms": 610.3,
+  "response": "{\n  \"answer\": \"The total realized P&L across all closed trades is $10,255.17.\",\n  \"insight\": \"This positive P&L indicates that the closed trades have generated a net profit. The firm can use this result to assess the effectiveness of its trading strategies and allocate resources accordingly.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.309981894,
+   "completion_tokens": 146,
+   "completion_tokens_details": {
+    "reasoning_tokens": 47
+   },
+   "prompt_time": 0.016922945,
+   "prompt_tokens": 433,
+   "queue_time": 0.244507235,
+   "total_time": 0.326904839,
+   "total_tokens": 579
+  }
+ },
+ "8f7b7c8be09adac44801a7eeee82606538a28c7455344f5ffae67ca82894c8e1": {
+  "latency_ms": 1095.3,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT exit_reason, trades FROM trade_outcomes\"\n}",
+  "usage": {
+   "completion_time": 0.661927009,
+   "completion_tokens": 143,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   },
+   "prompt_time": 0.007594436,
+   "prompt_tokens": 2378,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244643378,
+   "total_time": 0.669521445,
+   "total_tokens": 2521
+  }
+ },
+ "8fd94caac03dd71591bca6ddd7a204182fed9f3cce492589b9019b6e0cab6bf3": {
+  "latency_ms": 728.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT sector, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_sector\"\n}",
+  "usage": {
+   "completion_time": 0.362535144,
+   "completion_tokens": 112,
+   "completion_tokens_details": {
+    "reasoning_tokens": 64
+   },
+   "prompt_time": 0.005813673,
+   "prompt_tokens": 2377,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.298101688,
+   "total_time": 0.368348817,
+   "total_tokens": 2489
+  }
+ },
+ "91645f6feb4ed71c6233d15756fd877511cdf0e421ca699b86b2e965dc2f72ac": {
+  "latency_ms": 770.0,
+  "response": "{\n  \"answer\": \"The three symbols that lost the most money are SLB (\u2011331.58), AVGO (\u2011128.90), and XOM (\u2011126.60).\",\n  \"insight\": \"SLB incurred the largest loss, indicating a significant underperformance relative to other holdings. The other two symbols also show notable negative returns, suggesting a need to review exposure to these stocks.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.431477368,
+   "completion_tokens": 208,
+   "completion_tokens_details": {
+    "reasoning_tokens": 84
+   },
+   "prompt_time": 0.023702775,
+   "prompt_tokens": 503,
+   "queue_time": 0.244756452,
+   "total_time": 0.455180143,
+   "total_tokens": 711
+  }
+ },
+ "91e9597c316733cc0ccda906654c07dc0970bf2fe430ada5edd32aaebbe8f019": {
+  "latency_ms": 715.7,
+  "response": "{\n  \"answer\": \"The overall win rate of your closed trades is 53.59%.\",\n  \"insight\": \"More than half of the trades are profitable, indicating a generally successful trading strategy. However, the 46.41% loss rate suggests there is still significant room for improvement in risk management.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.40680603,
+   "completion_tokens": 195,
+   "completion_tokens_details": {
+    "reasoning_tokens": 94
+   },
+   "prompt_time": 0.022112234,
+   "prompt_tokens": 449,
+   "queue_time": 0.244302401,
+   "total_time": 0.428918264,
+   "total_tokens": 644
+  }
+ },
+ "93a462a2056dca01a444a70c2763425c856b277d2a507b3291d4b78ef64bb6cf": {
+  "latency_ms": 768.6,
+  "response": "{\n  \"answer\": \"financials\",\n  \"insight\": \"The sector with the highest win rate is financials, indicating that strategies or investments in this sector are performing best relative to others. This suggests focusing resources or further analysis on financials could improve overall performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.484766253,
+   "completion_tokens": 204,
+   "completion_tokens_details": {
+    "reasoning_tokens": 114
+   },
+   "prompt_time": 0.006624565,
+   "prompt_tokens": 412,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.24476759,
+   "total_time": 0.491390818,
+   "total_tokens": 616
+  }
+ },
+ "96cd892827f622dbe68b48b6481d47638e73e61d4d39a6a72df673f7a4c1b6fb": {
+  "latency_ms": 1024.3,
+  "response": "{\n  \"answer\": \"The win rate of momentum trades in technology stocks was 27.27%.\",\n  \"insight\": \"Only about a quarter of momentum trades in the technology sector were profitable, indicating a relatively low success rate. This suggests the strategy may need refinement or tighter risk controls for tech stocks.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.406947685,
+   "completion_tokens": 196,
+   "completion_tokens_details": {
+    "reasoning_tokens": 96
+   },
+   "prompt_time": 0.273922166,
+   "prompt_tokens": 480,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.299216107,
+   "total_time": 0.680869851,
+   "total_tokens": 676
+  }
+ },
+ "9765a5e1a89e3e579417a84ba8ec87376ccd828d8f2ebdd54616e8d19c6247fa": {
+  "latency_ms": 817.3,
+  "response": "{\n  \"answer\": \"Strategy MEAN_REVERSION has an average return of 1.8%, while strategy MOMENTUM has an average return of -0.6%.\",\n  \"insight\": \"MEAN_REVERSION is generating positive returns on average, suggesting it is currently more profitable. MOMENTUM is showing a negative average return, indicating it may be underperforming and could require review.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"avg_return_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.526148702,
+   "completion_tokens": 235,
+   "completion_tokens_details": {
+    "reasoning_tokens": 112
+   },
+   "prompt_time": 0.01078313,
+   "prompt_tokens": 462,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244578476,
+   "total_time": 0.536931832,
+   "total_tokens": 697
+  }
+ },
+ "97789f248828717bb4d7e00a0b7b6f42dfcaa1ec6484a3bc5820a4f567aae716": {
+  "latency_ms": 896.4,
+  "response": "{\n  \"answer\": \"financials\",\n  \"insight\": \"The financials sector had the highest win rate among all sectors. This suggests that focusing resources or further analysis on the financials sector could be beneficial for the business.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.400520266,
+   "completion_tokens": 193,
+   "completion_tokens_details": {
+    "reasoning_tokens": 111
+   },
+   "prompt_time": 0.023767952,
+   "prompt_tokens": 444,
+   "queue_time": 0.38784064,
+   "total_time": 0.424288218,
+   "total_tokens": 637
+  }
+ },
+ "9a9f82f80af4a1e2bccd60bb9f094f3e6e1c8c9a21f31ac384ab1a19fab69882": {
+  "latency_ms": 713.3,
+  "response": "{\n  \"answer\": \"The total P&L for closed trades is 10,255.17.\",\n  \"insight\": \"Closed trades have generated a positive profit of over ten thousand dollars, indicating a net gain for the period. This result suggests the trading strategy is currently profitable, but further analysis is needed to assess consistency over time.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.370118481,
+   "completion_tokens": 179,
+   "completion_tokens_details": {
+    "reasoning_tokens": 73
+   },
+   "prompt_time": 0.010780222,
+   "prompt_tokens": 463,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244240026,
+   "total_time": 0.380898703,
+   "total_tokens": 642
+  }
+ },
+ "9bf9af56d413d0355fb7c115fcf57412c134b6f28532de06daf7590dc608c277": {
+  "latency_ms": 848.6,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(equity, 2) AS equity_on_last_day_2025 FROM equity_daily WHERE date = (SELECT MAX(date) FROM equity_daily WHERE date <= '2025-12-31');\"\n}",
+  "usage": {
+   "completion_time": 0.481315666,
+   "completion_tokens": 191,
+   "completion_tokens_details": {
+    "reasoning_tokens": 120
+   },
+   "prompt_time": 0.006171935,
+   "prompt_tokens": 2384,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.258352247,
+   "total_time": 0.487487601,
+   "total_tokens": 2575
+  }
+ },
+ "9c7555c544bd544a43219a14c91ca289166ff58f15274362c4496b711888d804": {
+  "latency_ms": 720.8,
+  "response": "{\n  \"answer\": \"38\",\n  \"insight\": \"The data shows that 38 technology sector trades were closed due to stop\u2011loss orders. This suggests a notable level of automatic exits, indicating either heightened volatility or active risk management within the technology sector.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.417251673,
+   "completion_tokens": 201,
+   "completion_tokens_details": {
+    "reasoning_tokens": 111
+   },
+   "prompt_time": 0.018386623,
+   "prompt_tokens": 428,
+   "queue_time": 0.245246728,
+   "total_time": 0.435638296,
+   "total_tokens": 629
+  }
+ },
+ "9c8fa958d08c9a9f0af97541c07efd831bfafd09001df5aadf47b264b1b52da5": {
+  "latency_ms": 874.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT exit_reason, ROUND(avg_pnl, 2) AS avg_pnl FROM trade_outcomes\"\n}",
+  "usage": {
+   "completion_time": 0.318225446,
+   "completion_tokens": 154,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   },
+   "prompt_time": 0.112603626,
+   "prompt_tokens": 2383,
+   "queue_time": 0.257804611,
+   "total_time": 0.430829072,
+   "total_tokens": 2537
+  }
+ },
+ "a35b197f49144ccaa7311fd414170f1a24371ff0a61763e7500ef12450ebb31f": {
+  "latency_ms": 807.8,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT entry_regime, ROUND(win_rate_pct, 2) AS win_rate_pct FROM perf_by_regime\"\n}",
+  "usage": {
+   "completion_time": 0.37502201,
+   "completion_tokens": 179,
+   "completion_tokens_details": {
+    "reasoning_tokens": 128
+   },
+   "prompt_time": 0.099382314,
+   "prompt_tokens": 2381,
+   "queue_time": 0.245098761,
+   "total_time": 0.474404324,
+   "total_tokens": 2560
+  }
+ },
+ "a4e6f1ffccba580ba15bef90fcb2cd76481dcd36754ddf160fc5d5746bc647d4": {
+  "latency_ms": 1306.4,
+  "response": "{\n  \"answer\": \"2026-01: -21.37, 2026-02: 602.79, 2026-03: 213.98, 2026-04: 2988.47, 2026-05: 60.34, 2026-06: -360.43, 2026-07: 1248.57, 2026-08: 495.84, 2026-09: -266.75\",\n  \"insight\": \"April 2026 delivered the strongest profit at 2,988.47, while January, June, and September posted losses, showing notable month\u2011to\u2011month volatility. The overall pattern suggests the business experienced both high\u2011earning periods and occasional downturns within the first nine months of 2026.\",\n  \"chart\": {\n    \"type\": \"line\",\n    \"x\": \"exit_month\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.794823405,
+   "completion_tokens": 380,
+   "completion_tokens_details": {
+    "reasoning_tokens": 166
+   },
+   "prompt_time": 0.026790128,
+   "prompt_tokens": 645,
+   "queue_time": 0.381016375,
+   "total_time": 0.821613533,
+   "total_tokens": 1025
+  }
+ },
+ "a5ac3bf78f152329386f5c6fef4d95538d45b6bcf370526974269fc97ad3427e": {
+  "latency_ms": 762.9,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol FROM trades GROUP BY symbol ORDER BY COUNT(*) DESC LIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.398653212,
+   "completion_tokens": 193,
+   "completion_tokens_details": {
+    "reasoning_tokens": 149
+   },
+   "prompt_time": 0.005403043,
+   "prompt_tokens": 2377,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.245054131,
+   "total_time": 0.404056255,
+   "total_tokens": 2570
+  }
+ },
+ "a6454650cc6b93205ae15eac923a34f383768c0916821dbf79e41c7eed255305": {
+  "latency_ms": 1201.3,
+  "response": "{\n  \"answer\": \"5 mean reversion trades were opened on HIGH_VOLATILITY days.\",\n  \"insight\": \"The data shows only five mean reversion trades were initiated during high volatility periods, suggesting limited usage of this strategy under such conditions. To capture more opportunities, the firm may consider reviewing the criteria or capacity for mean reversion trades when volatility spikes.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.484599489,
+   "completion_tokens": 233,
+   "completion_tokens_details": {
+    "reasoning_tokens": 122
+   },
+   "prompt_time": 0.01943261,
+   "prompt_tokens": 472,
+   "queue_time": 0.298453716,
+   "total_time": 0.504032099,
+   "total_tokens": 705
+  }
+ },
+ "a7ff9f6ec034f593d5b7c8022131d7242ab5beb8d38c4a994470e2bc26fcd4ba": {
+  "latency_ms": 731.5,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT COUNT(*) AS tech_stop_trades FROM trades_enriched WHERE sector = 'technology' AND exit_reason = 'STOP_LOSS';\"\n}",
+  "usage": {
+   "completion_time": 0.404833721,
+   "completion_tokens": 184,
+   "completion_tokens_details": {
+    "reasoning_tokens": 128
+   },
+   "prompt_time": 0.005676576,
+   "prompt_tokens": 2377,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.258255688,
+   "total_time": 0.410510297,
+   "total_tokens": 2561
+  }
+ },
+ "a8b4545285570126225eefbacd7c4379407e1605f1f97fbc2d0c1c1a71960ac1": {
+  "latency_ms": 1075.8,
+  "response": "{\n  \"answer\": \"IN-SAMPLE (2y)\",\n  \"insight\": \"The IN-SAMPLE (2y) validation window achieved the highest Sharpe ratio, indicating the best risk\u2011adjusted performance among the windows tested. This suggests that focusing on similar two\u2011year in\u2011sample periods may yield more favorable strategy outcomes.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.588207209,
+   "completion_tokens": 286,
+   "completion_tokens_details": {
+    "reasoning_tokens": 181
+   },
+   "prompt_time": 0.008538201,
+   "prompt_tokens": 453,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.381455178,
+   "total_time": 0.59674541,
+   "total_tokens": 739
+  }
+ },
+ "a94761f995d7071d2bd7e8217100afd7e2a194a2121cce9bc67d8512c35ac721": {
+  "latency_ms": 1204.9,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(SUM(pnl), 2) AS total_realized_pnl FROM trades WHERE status = 'closed';\"\n}",
+  "usage": {
+   "completion_time": 0.564668839,
+   "completion_tokens": 271,
+   "completion_tokens_details": {
+    "reasoning_tokens": 218
+   },
+   "prompt_time": 0.123837754,
+   "prompt_tokens": 2381,
+   "queue_time": 0.299717571,
+   "total_time": 0.688506593,
+   "total_tokens": 2652
+  }
+ },
+ "aa4bbb973ebb996d670781ac038441a01e3567c7de9b8cec3926d7aea6888bfa": {
+  "latency_ms": 618.3,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_symbol ORDER BY total_pnl DESC LIMIT 3\"\n}",
+  "usage": {
+   "completion_time": 0.301587994,
+   "completion_tokens": 147,
+   "completion_tokens_details": {
+    "reasoning_tokens": 90
+   },
+   "prompt_time": 0.006627345,
+   "prompt_tokens": 2382,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244652364,
+   "total_time": 0.308215339,
+   "total_tokens": 2529
+  }
+ },
+ "ade5b41564cd3971fa6df336ab8d85007028b8bb9f73101f154afed78e154aef": {
+  "latency_ms": 1563.2,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT strategy,\\n       ROUND(100.0 * SUM(is_win) / COUNT(*), 2) AS win_rate_pct\\nFROM trades_enriched\\nWHERE exit_date IS NOT NULL\\nGROUP BY strategy\"\n}",
+  "usage": {
+   "completion_time": 0.898683395,
+   "completion_tokens": 425,
+   "completion_tokens_details": {
+    "reasoning_tokens": 354
+   },
+   "prompt_time": 0.128990289,
+   "prompt_tokens": 2377,
+   "queue_time": 0.381187028,
+   "total_time": 1.027673684,
+   "total_tokens": 2802
+  }
+ },
+ "af2dc72d2b0f46090641a78c48fe2b33711e006d55e94a040a1bd46cda899de3": {
+  "latency_ms": 1290.1,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(100.0 * SUM(CASE WHEN t.pnl > 0 THEN 1 ELSE 0 END) / COUNT(*), 2) AS win_rate_pct\\nFROM trades t\\nJOIN symbols s ON t.symbol = s.symbol\\nWHERE t.strategy = 'MOMENTUM'\\n  AND s.sector = 'technology'\\n  AND t.status = 'closed';\"\n}",
+  "usage": {
+   "completion_time": 0.873279396,
+   "completion_tokens": 419,
+   "completion_tokens_details": {
+    "reasoning_tokens": 311
+   },
+   "prompt_time": 0.104924168,
+   "prompt_tokens": 2381,
+   "queue_time": 0.244790327,
+   "total_time": 0.978203564,
+   "total_tokens": 2800
+  }
+ },
+ "b25af6e62a034dc4da6e87f237a468e6610b0d63701c631333dc84ddd66fb538": {
+  "latency_ms": 591.2,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The database does not contain information about the Federal Reserve interest rate.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.179803262,
+   "completion_tokens": 86,
+   "completion_tokens_details": {
+    "reasoning_tokens": 42
+   },
+   "prompt_time": 0.112713964,
+   "prompt_tokens": 2378,
+   "queue_time": 0.245881649,
+   "total_time": 0.292517226,
+   "total_tokens": 2464
+  }
+ },
+ "b36e4d5fca177b60c0b8fe9b1bcf5308bd00b5427dcd4277f53c9d2d83d576f7": {
+  "latency_ms": 813.1,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol, ROUND(pnl, 2) AS loss FROM trades WHERE status = 'closed' AND pnl < 0 ORDER BY pnl ASC LIMIT 5\"\n}",
+  "usage": {
+   "completion_time": 0.507297983,
+   "completion_tokens": 246,
+   "completion_tokens_details": {
+    "reasoning_tokens": 185
+   },
+   "prompt_time": 0.006169266,
+   "prompt_tokens": 2382,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244727444,
+   "total_time": 0.513467249,
+   "total_tokens": 2628
+  }
+ },
+ "b3c9eea59288b967ce9470bd59bfa4f3b12860cb17f83b17b2620e9880e4723b": {
+  "latency_ms": 870.2,
+  "response": "{\n  \"answer\": \"Total P&L by sector:\\n- Energy: 2,198.87\\n- Financials: 4,452.89\\n- Technology: 3,603.41\",\n  \"insight\": \"Financials generated the highest profit, followed by technology and then energy. This suggests that allocating more resources to the financial sector could further boost overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.548125929,
+   "completion_tokens": 268,
+   "completion_tokens_details": {
+    "reasoning_tokens": 147
+   },
+   "prompt_time": 0.019054955,
+   "prompt_tokens": 495,
+   "queue_time": 0.244620084,
+   "total_time": 0.567180884,
+   "total_tokens": 763
+  }
+ },
+ "b50ffe99943e70f7c7719a51dd57d7180e79c79f40a76b763a89b1bb259bbe1a": {
+  "latency_ms": 976.7,
+  "response": "{\n  \"answer\": \"The top three symbols by total P&L are:\\n- MPC: $1,394.87\\n- WFC: $1,328.85\\n- META: $1,265.15\",\n  \"insight\": \"These three symbols generated the highest profits, suggesting they are the strongest contributors to overall performance. Prioritizing resources and risk management around these positions could enhance future returns.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.551111575,
+   "completion_tokens": 265,
+   "completion_tokens_details": {
+    "reasoning_tokens": 137
+   },
+   "prompt_time": 0.082874534,
+   "prompt_tokens": 507,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244407842,
+   "total_time": 0.633986109,
+   "total_tokens": 772
+  }
+ },
+ "b6414dc29caf76b96d24ff9be2eabfc6b98e6ac2edab9e26e7428eca109c5d1c": {
+  "latency_ms": 782.1,
+  "response": "{\n  \"answer\": \"36 trades were opened in the first quarter of 2026.\",\n  \"insight\": \"The business recorded 36 new trades during Q1 2026, reflecting the level of trading activity for that period. This figure can serve as a baseline for comparing future quarterly performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.396796218,
+   "completion_tokens": 191,
+   "completion_tokens_details": {
+    "reasoning_tokens": 93
+   },
+   "prompt_time": 0.023038105,
+   "prompt_tokens": 482,
+   "queue_time": 0.24447479,
+   "total_time": 0.419834323,
+   "total_tokens": 673
+  }
+ },
+ "ba56801f7c8fb4d01c1a868f428b4b9bb189213f8a91dfbc058457f46fc058bb": {
+  "latency_ms": 825.6,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT sector FROM perf_by_sector ORDER BY win_rate_pct DESC LIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.336628134,
+   "completion_tokens": 163,
+   "completion_tokens_details": {
+    "reasoning_tokens": 119
+   },
+   "prompt_time": 0.110099368,
+   "prompt_tokens": 2377,
+   "queue_time": 0.298585632,
+   "total_time": 0.446727502,
+   "total_tokens": 2540
+  }
+ },
+ "be2b04fe46c55e1e318d8b2d8ccbfb7c89f451522976314b0380da15c874ec62": {
+  "latency_ms": 621.9,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The database only contains backtest data from 2024-12 to 2026-09 and live data from the current engine; there is no data covering the 2008 financial crisis.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.256762418,
+   "completion_tokens": 122,
+   "completion_tokens_details": {
+    "reasoning_tokens": 55
+   },
+   "prompt_time": 0.008202326,
+   "prompt_tokens": 2382,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.29975037,
+   "total_time": 0.264964744,
+   "total_tokens": 2504
+  }
+ },
+ "bf2488ea6f6dfdae9e3a3451a9b83a19b9c8eaf75a88a3a0e9a823b1a0ae6443": {
+  "latency_ms": 599.5,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT window_name FROM backtest_windows ORDER BY sharpe_ratio DESC LIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.256023701,
+   "completion_tokens": 124,
+   "completion_tokens_details": {
+    "reasoning_tokens": 79
+   },
+   "prompt_time": 0.006062449,
+   "prompt_tokens": 2379,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244951466,
+   "total_time": 0.26208615,
+   "total_tokens": 2503
+  }
+ },
+ "bf2deb00060dc9c4149dcf1d9954011545d14492e1a7e7df4120b528c21409d4": {
+  "latency_ms": 1164.8,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT strategy, ROUND(SUM(pnl), 2) AS total_pnl\\nFROM trades_enriched\\nWHERE entry_regime = 'RANGING' AND exit_date IS NOT NULL\\nGROUP BY strategy\\nORDER BY total_pnl DESC\\nLIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.713080485,
+   "completion_tokens": 338,
+   "completion_tokens_details": {
+    "reasoning_tokens": 256
+   },
+   "prompt_time": 0.096380091,
+   "prompt_tokens": 2388,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.299235806,
+   "total_time": 0.809460576,
+   "total_tokens": 2726
+  }
+ },
+ "c18cdd99b95b3eb0e54a1ccbe41971a1dd3b218f7705235cbe846b4afae2fa99": {
+  "latency_ms": 813.5,
+  "response": "{\n  \"answer\": \"WFC\",\n  \"insight\": \"The symbol WFC had the highest number of trades in the dataset, indicating it is the most actively traded security. This suggests strong market interest or liquidity for WFC relative to other symbols.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.317837089,
+   "completion_tokens": 153,
+   "completion_tokens_details": {
+    "reasoning_tokens": 66
+   },
+   "prompt_time": 0.080769302,
+   "prompt_tokens": 412,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380581676,
+   "total_time": 0.398606391,
+   "total_tokens": 565
+  }
+ },
+ "c4d9d98bdbc22fbf82a18f1745995afdc4b950171294b2399f1de440330f7654": {
+  "latency_ms": 1027.0,
+  "response": "{\n  \"answer\": \"Sector totals: energy \u2013 2198.87, financials \u2013 4452.89, technology \u2013 3603.41.\",\n  \"insight\": \"Financials delivered the highest total P&L, showing strong profitability in that sector. Energy posted the lowest total P&L, indicating a potential area for performance improvement.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.681444182,
+   "completion_tokens": 293,
+   "completion_tokens_details": {
+    "reasoning_tokens": 179
+   },
+   "prompt_time": 0.009851294,
+   "prompt_tokens": 463,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.299327532,
+   "total_time": 0.691295476,
+   "total_tokens": 756
+  }
+ },
+ "c5a19ad4e8b071c6c01aa8a6cfd66387feed2543676ae3392d0eeb7fb3fe0c90": {
+  "latency_ms": 1259.0,
+  "response": "{\n  \"answer\": \"Average holding period by sector: Energy\u202f=\u202f11.6 days, Financials\u202f=\u202f12.1 days, Technology\u202f=\u202f9.2 days.\",\n  \"insight\": \"Technology trades turn over the fastest, which may reflect higher liquidity or short\u2011term strategies. Financials hold positions longer, indicating a more patient or longer\u2011term investment style.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"avg_holding_days\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.522428251,
+   "completion_tokens": 250,
+   "completion_tokens_details": {
+    "reasoning_tokens": 128
+   },
+   "prompt_time": 0.128500401,
+   "prompt_tokens": 511,
+   "queue_time": 0.383374171,
+   "total_time": 0.650928652,
+   "total_tokens": 761
+  }
+ },
+ "c683a17cda0eb8e36f9996d662c8730e1340fc8c6cd70d6e54b4f963360bcb70": {
+  "latency_ms": 925.7,
+  "response": "{\n  \"answer\": \"HIGH_VOLATILITY: 83.3%, RANGING: 50.0%, TRENDING: 59.2%\",\n  \"insight\": \"Trades entered during high volatility have the highest win rate at 83.3%, while ranging regimes have the lowest at 50.0%. Prioritizing entries in high\u2011volatility conditions could boost overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"entry_regime\",\n    \"y\": \"win_rate_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.612438987,
+   "completion_tokens": 291,
+   "completion_tokens_details": {
+    "reasoning_tokens": 166
+   },
+   "prompt_time": 0.011002071,
+   "prompt_tokens": 511,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244633751,
+   "total_time": 0.623441058,
+   "total_tokens": 802
+  }
+ },
+ "c7618e11ba45a028af7bd559d2c86a8e509d8ea84e6bd51274bca81986cee0c0": {
+  "latency_ms": 1078.6,
+  "response": "{\n  \"answer\": \"1. financials \u2013 1.8%\\n2. energy \u2013 1.49%\\n3. technology \u2013 1.27%\",\n  \"insight\": \"Financials deliver the highest average return per trade, outperforming energy and technology. The gap suggests focusing resources on the financial sector to maximize returns.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"sector\",\n    \"y\": \"avg_return_pct\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.643540195,
+   "completion_tokens": 309,
+   "completion_tokens_details": {
+    "reasoning_tokens": 198
+   },
+   "prompt_time": 0.018321684,
+   "prompt_tokens": 472,
+   "queue_time": 0.381027206,
+   "total_time": 0.661861879,
+   "total_tokens": 781
+  }
+ },
+ "c8308515aa8b5ca302f55e39afcd6de4e3efa040dec0a4315778b8b08cb1ae25": {
+  "latency_ms": 892.6,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT symbol, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_symbol ORDER BY total_pnl ASC LIMIT 3\"\n}",
+  "usage": {
+   "completion_time": 0.427986028,
+   "completion_tokens": 205,
+   "completion_tokens_details": {
+    "reasoning_tokens": 148
+   },
+   "prompt_time": 0.111153135,
+   "prompt_tokens": 2380,
+   "queue_time": 0.244893463,
+   "total_time": 0.539139163,
+   "total_tokens": 2585
+  }
+ },
+ "c835ba2c95a6a85825715aba9698d3d7fb51a905622141ebc42b4e132eebdc24": {
+  "latency_ms": 1133.2,
+  "response": "{\n  \"answer\": \"The five largest losing trades are: AMZN \u2013 -264.83, NVDA \u2013 -252.55, SLB \u2013 -249.35, PSX \u2013 -247.88, AVGO \u2013 -245.55.\",\n  \"insight\": \"These top losses show that the portfolio\u2019s biggest downside exposures are concentrated in a few high\u2011profile stocks. Strengthening risk controls on these symbols could help limit future losses.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"loss\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.695257741,
+   "completion_tokens": 335,
+   "completion_tokens_details": {
+    "reasoning_tokens": 204
+   },
+   "prompt_time": 0.020318333,
+   "prompt_tokens": 501,
+   "queue_time": 0.380766996,
+   "total_time": 0.715576074,
+   "total_tokens": 836
+  }
+ },
+ "c89db82df65eac375b1a47cb34a4f6354542159039154a38df3a5cc8f0e1076a": {
+  "latency_ms": 827.5,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The request asks for metadata (sqlite_master) and CREATE statements for all tables, which are not part of the provided data dictionary and cannot be queried using the listed tables and views.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.437472068,
+   "completion_tokens": 212,
+   "completion_tokens_details": {
+    "reasoning_tokens": 145
+   },
+   "prompt_time": 0.005831366,
+   "prompt_tokens": 2384,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.298490093,
+   "total_time": 0.443303434,
+   "total_tokens": 2596
+  }
+ },
+ "d2c8150b6a5a606455b5725b88245f744442319121aef298ed322f4a4712f6cc": {
+  "latency_ms": 785.9,
+  "response": "{\n  \"answer\": \"5\",\n  \"insight\": \"The data shows that only five mean reversion trades were opened on high volatility days, indicating limited activity under these conditions. This suggests the strategy may be underutilized during high volatility, potentially missing opportunities or reflecting risk management constraints.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.450285989,
+   "completion_tokens": 215,
+   "completion_tokens_details": {
+    "reasoning_tokens": 121
+   },
+   "prompt_time": 0.062257462,
+   "prompt_tokens": 440,
+   "queue_time": 0.235618184,
+   "total_time": 0.512543451,
+   "total_tokens": 655
+  }
+ },
+ "d32dfd09e5b93804ad6f0a959bb62700f578069c2352f7cebd6e3a1f7ebe7ccd": {
+  "latency_ms": 912.6,
+  "response": "{\n  \"answer\": \"The portfolio equity on the last trading day of 2025 was $109,934.47.\",\n  \"insight\": \"The portfolio closed 2025 with an equity of $109,934.47, reflecting the total value of holdings at year\u2011end. This figure provides a baseline for comparing future performance and assessing growth.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.457660725,
+   "completion_tokens": 206,
+   "completion_tokens_details": {
+    "reasoning_tokens": 97
+   },
+   "prompt_time": 0.012126969,
+   "prompt_tokens": 489,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244283633,
+   "total_time": 0.469787694,
+   "total_tokens": 695
+  }
+ },
+ "d375efa246ff8340dbd6e1b403af426440ca283f9ae56297603a405d87f03028": {
+  "latency_ms": 1008.2,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT strategy, ROUND(SUM(pnl), 2) AS total_pnl FROM trades WHERE status = 'closed' GROUP BY strategy\"\n}",
+  "usage": {
+   "completion_time": 0.347165473,
+   "completion_tokens": 166,
+   "completion_tokens_details": {
+    "reasoning_tokens": 110
+   },
+   "prompt_time": 0.09550596,
+   "prompt_tokens": 2380,
+   "queue_time": 0.381205671,
+   "total_time": 0.442671433,
+   "total_tokens": 2546
+  }
+ },
+ "d524c391b803abbc7493b004b3c21a181499e84c2caf0d9f4f1db83e6b46e6e6": {
+  "latency_ms": 1114.3,
+  "response": "{\n  \"answerable\": false,\n  \"reason\": \"The request asks for the system prompt and rules, which is disallowed.\",\n  \"sql\": \"\"\n}",
+  "usage": {
+   "completion_time": 0.236897701,
+   "completion_tokens": 115,
+   "completion_tokens_details": {
+    "reasoning_tokens": 72
+   },
+   "prompt_time": 0.258389592,
+   "prompt_tokens": 2385,
+   "queue_time": 0.386693295,
+   "total_time": 0.495287293,
+   "total_tokens": 2500
+  }
+ },
+ "d76921f9b8e898c87b263b7a748e8f2294c24750851b382758e40f3011cd24f4": {
+  "latency_ms": 1161.9,
+  "response": "{\n  \"answer\": \"The MEAN_REVERSION strategy achieved the highest total P&L on trades entered in a RANGING regime, with a profit of 3175.0.\",\n  \"insight\": \"MEAN_REVERSION generated the most profit in a ranging market, indicating it is the most effective approach under those conditions. Prioritizing this strategy could boost overall profitability when the market is not trending.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.721940885,
+   "completion_tokens": 350,
+   "completion_tokens_details": {
+    "reasoning_tokens": 229
+   },
+   "prompt_time": 0.019105238,
+   "prompt_tokens": 468,
+   "queue_time": 0.380699076,
+   "total_time": 0.741046123,
+   "total_tokens": 818
+  }
+ },
+ "d76fdff335227a010dcc610f008c47ee000f04e669317b9ec67f2bda876f5e35": {
+  "latency_ms": 1174.6,
+  "response": "{\n  \"answer\": \"The five largest losing trades are: AMZN \u2013 -264.83, NVDA \u2013 -252.55, SLB \u2013 -249.35, PSX \u2013 -247.88, AVGO \u2013 -245.55.\",\n  \"insight\": \"These trades represent the most significant losses among recent closed positions, highlighting exposure to high\u2011volatility stocks. Implementing tighter risk controls for these symbols could help limit future losses.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"loss\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.835825104,
+   "completion_tokens": 332,
+   "completion_tokens_details": {
+    "reasoning_tokens": 200
+   },
+   "prompt_time": 0.013073312,
+   "prompt_tokens": 533,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244841795,
+   "total_time": 0.848898416,
+   "total_tokens": 865
+  }
+ },
+ "d7b265aae736644471673e1978ed2e07cafc00a8b6754b8f7d93a3c6fac5ff80": {
+  "latency_ms": 2275.9,
+  "response": "{\n  \"answer\": \"Symbol | Total PnL\\n--- | ---\\nAAPL | 1158.42\\nAMZN | 140.49\\nAVGO | -128.90\\nBAC | 129.36\\nBLK | 580.57\\nCOP | 633.96\\nCVX | 62.04\\nEOG | 284.77\\nGOOGL | 913.08\\nGS | 908.95\\nJPM | 444.91\\nMETA | 1265.15\\nMPC | 1394.87\\nMS | 761.25\\nMSFT | -94.85\\nNVDA | 207.66\\nPSX | 281.41\\nSCHW | 299.00\\nSLB | -331.58\\nTSM | 142.36\\nWFC | 1328.85\\nXOM | -126.60\",\n  \"insight\": \"Most symbols delivered positive returns, with MPC ($1,394.87) and WFC ($1,328.85) leading the portfolio. However, positions like SLB (-$331.58) and AVGO (-$128.90) generated losses, highlighting specific assets that may need risk reassessment.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 1.451686843,
+   "completion_tokens": 702,
+   "completion_tokens_details": {
+    "reasoning_tokens": 399
+   },
+   "prompt_time": 0.485446699,
+   "prompt_tokens": 790,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.29988677,
+   "total_time": 1.937133542,
+   "total_tokens": 1492
+  }
+ },
+ "d82c2cf85820cb88ff65f47f61dd50098def19efd350ee44227e939b4e9d8c1a": {
+  "latency_ms": 818.2,
+  "response": "{\n  \"answer\": \"MPC \u2013 $1,394.87; WFC \u2013 $1,328.85; META \u2013 $1,265.15\",\n  \"insight\": \"MPC generated the highest profit, showing it is the top\u2011performing symbol in the dataset. WFC and META also delivered strong gains, indicating they are valuable contributors to overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"symbol\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.518184649,
+   "completion_tokens": 249,
+   "completion_tokens_details": {
+    "reasoning_tokens": 130
+   },
+   "prompt_time": 0.020948944,
+   "prompt_tokens": 475,
+   "queue_time": 0.244627649,
+   "total_time": 0.539133593,
+   "total_tokens": 724
+  }
+ },
+ "da3f3f170fbe5ccf3c26253dd8ccdccd77a70732d269b39ddfb63708a7bdbcae": {
+  "latency_ms": 745.6,
+  "response": "{\n  \"answer\": \"The total P&L on trades closed in 2025 was $6,816.96.\",\n  \"insight\": \"The business generated a positive profit of $6.8k from closed trades in 2025, indicating effective trading performance for that year. Maintaining or improving this profitability will be key to sustaining growth.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.383792438,
+   "completion_tokens": 182,
+   "completion_tokens_details": {
+    "reasoning_tokens": 74
+   },
+   "prompt_time": 0.024210851,
+   "prompt_tokens": 455,
+   "queue_time": 0.297943692,
+   "total_time": 0.408003289,
+   "total_tokens": 637
+  }
+ },
+ "dbc7a977a28f1eafae7439a8f643661e5cee673826e14c82fbcb4754dd13d343": {
+  "latency_ms": 1029.1,
+  "response": "{\n  \"answer\": \"38 technology trades were stopped out.\",\n  \"insight\": \"The data shows that 38 trades in the technology sector were closed because of stop\u2011loss triggers. This suggests that stop\u2011loss orders are actively managing risk in the tech portfolio, but the volume may merit a review of position sizing or stop\u2011loss thresholds.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.439899698,
+   "completion_tokens": 212,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   },
+   "prompt_time": 0.119401197,
+   "prompt_tokens": 460,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.380586777,
+   "total_time": 0.559300895,
+   "total_tokens": 672
+  }
+ },
+ "dc91fb81e884cb0a7874e9eaabf90cd12a3bbb95a6ad3f18ffd8ba2a4cf18129": {
+  "latency_ms": 676.0,
+  "response": "{\n  \"answer\": \"There are 181 trades in the database.\",\n  \"insight\": \"The database currently holds 181 trade records. This total reflects the overall volume of trades captured to date.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.334181712,
+   "completion_tokens": 161,
+   "completion_tokens_details": {
+    "reasoning_tokens": 85
+   },
+   "prompt_time": 0.023637781,
+   "prompt_tokens": 439,
+   "queue_time": 0.244263496,
+   "total_time": 0.357819493,
+   "total_tokens": 600
+  }
+ },
+ "df1965a44e393528d5b9dd79a23d7e8b05f1d033f8389571624a148623deac1a": {
+  "latency_ms": 1017.5,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT sector, ROUND(avg_pnl_pct, 2) AS avg_return_pct FROM perf_by_sector ORDER BY avg_return_pct DESC\"\n}",
+  "usage": {
+   "completion_time": 0.446756553,
+   "completion_tokens": 198,
+   "completion_tokens_details": {
+    "reasoning_tokens": 143
+   },
+   "prompt_time": 0.00529683,
+   "prompt_tokens": 2382,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.380919096,
+   "total_time": 0.452053383,
+   "total_tokens": 2580
+  }
+ },
+ "e217a8d112988392c20467c64db54e1510db968114e0c7b9fa930c695d0bb094": {
+  "latency_ms": 894.0,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT COUNT(*) AS mean_rev_trades FROM trades_enriched WHERE strategy = 'MEAN_REVERSION' AND entry_regime = 'HIGH_VOLATILITY';\"\n}",
+  "usage": {
+   "completion_time": 0.465890306,
+   "completion_tokens": 226,
+   "completion_tokens_details": {
+    "reasoning_tokens": 165
+   },
+   "prompt_time": 0.093533031,
+   "prompt_tokens": 2384,
+   "queue_time": 0.244929158,
+   "total_time": 0.559423337,
+   "total_tokens": 2610
+  }
+ },
+ "e63e369c0955a8bde3f594991779a2c3f0571011f402421f72176d02dc6d3277": {
+  "latency_ms": 1050.2,
+  "response": "{\n  \"answer\": \"Average P&L per trade by exit reason: END_OF_TEST = -43.74, STOP_LOSS = -144.11, TAKE_PROFIT = 337.33, TIME_EXIT = 88.85.\",\n  \"insight\": \"Trades that exit on TAKE_PROFIT generate a strong positive average P&L of 337.33, whereas STOP_LOSS exits lose on average 144.11. The other exit reasons show modest loss or gain, suggesting that emphasizing profit\u2011taking exits could improve overall profitability.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"exit_reason\",\n    \"y\": \"avg_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.697230005,
+   "completion_tokens": 339,
+   "completion_tokens_details": {
+    "reasoning_tokens": 185
+   },
+   "prompt_time": 0.026258111,
+   "prompt_tokens": 526,
+   "queue_time": 0.244756753,
+   "total_time": 0.723488116,
+   "total_tokens": 865
+  }
+ },
+ "e71dc7fb300e34cc6fc83b2313a4ebe1aee2f4ac57fea69f7acbb43a3e2fae17": {
+  "latency_ms": 875.3,
+  "response": "{\n  \"answer\": \"There are 181 trades in the database.\",\n  \"insight\": \"The database currently holds 181 recorded trades, reflecting the total trading activity captured so far. This count serves as a baseline metric for tracking future growth or comparing against other periods.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.367866243,
+   "completion_tokens": 175,
+   "completion_tokens_details": {
+    "reasoning_tokens": 85
+   },
+   "prompt_time": 0.019197041,
+   "prompt_tokens": 407,
+   "queue_time": 0.385190128,
+   "total_time": 0.387063284,
+   "total_tokens": 582
+  }
+ },
+ "e822a3308ed4ef283ebdf2ebc49d5b439895f7d6979c06468d1db305e8933527": {
+  "latency_ms": 1024.0,
+  "response": "{\n  \"answer\": \"Strategy MEAN_REVERSION: total P&L = 10,651.10; Strategy MOMENTUM: total P&L = -395.93.\",\n  \"insight\": \"The MEAN_REVERSION strategy generated a strong positive profit, while the MOMENTUM strategy resulted in a loss. This suggests that MEAN_REVERSION is currently more profitable and may warrant further allocation of resources.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.48065533,
+   "completion_tokens": 231,
+   "completion_tokens_details": {
+    "reasoning_tokens": 104
+   },
+   "prompt_time": 0.021414291,
+   "prompt_tokens": 493,
+   "queue_time": 0.381391427,
+   "total_time": 0.502069621,
+   "total_tokens": 724
+  }
+ },
+ "ed05cb996698e9a65b011e21391ae0c3c8c183fd9e393046df41c7d02d17fd71": {
+  "latency_ms": 880.4,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT exit_month, ROUND(total_pnl, 2) AS total_pnl FROM perf_by_month ORDER BY total_pnl DESC LIMIT 1\"\n}",
+  "usage": {
+   "completion_time": 0.393979237,
+   "completion_tokens": 190,
+   "completion_tokens_details": {
+    "reasoning_tokens": 132
+   },
+   "prompt_time": 0.112289011,
+   "prompt_tokens": 2384,
+   "queue_time": 0.299369431,
+   "total_time": 0.506268248,
+   "total_tokens": 2574
+  }
+ },
+ "ed514e4f7ec732bfb296b5559f65bb5a17ea20c18b4c2df911963db31745ec0c": {
+  "latency_ms": 1132.0,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(total_pnl, 2) AS total_pnl FROM perf_by_regime WHERE entry_regime = 'TRENDING';\"\n}",
+  "usage": {
+   "completion_time": 0.48308517,
+   "completion_tokens": 234,
+   "completion_tokens_details": {
+    "reasoning_tokens": 174
+   },
+   "prompt_time": 0.254863203,
+   "prompt_tokens": 2386,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.298809012,
+   "total_time": 0.737948373,
+   "total_tokens": 2620
+  }
+ },
+ "f17ce32726b9a52683ca8a89bd98cc859bf09a8756a1755cbeebba6d16b5e5ef": {
+  "latency_ms": 910.8,
+  "response": "{\n  \"answer\": \"END_OF_TEST: 4 trades\\nSTOP_LOSS: 75 trades\\nTAKE_PROFIT: 49 trades\\nTIME_EXIT: 53 trades\",\n  \"insight\": \"The majority of trades (75) were closed due to STOP_LOSS, indicating a potential need to review risk management settings. TAKE_PROFIT and TIME_EXIT together account for over half of the remaining closures, suggesting profit targets and time-based exits are also significant factors.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"exit_reason\",\n    \"y\": \"trades\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.45229145,
+   "completion_tokens": 219,
+   "completion_tokens_details": {
+    "reasoning_tokens": 82
+   },
+   "prompt_time": 0.095474898,
+   "prompt_tokens": 466,
+   "queue_time": 0.303298215,
+   "total_time": 0.547766348,
+   "total_tokens": 685
+  }
+ },
+ "f2e3fd6992f2cb8fa7aeb681ca0c47a40ac42e13addb544ecff4033d9f31200c": {
+  "latency_ms": 1212.0,
+  "response": "{\n  \"answer\": \"The largest profit made on a single trade was $517.25.\",\n  \"insight\": \"The peak profit among all closed trades was $517.25, indicating the highest return achieved on any individual trade. This figure can serve as a benchmark for evaluating future trade performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.396009599,
+   "completion_tokens": 189,
+   "completion_tokens_details": {
+    "reasoning_tokens": 91
+   },
+   "prompt_time": 0.019128484,
+   "prompt_tokens": 456,
+   "queue_time": 0.381017186,
+   "total_time": 0.415138083,
+   "total_tokens": 645
+  }
+ },
+ "f39c9234c30b9189c22b5d4a722300881d684277a1fa2a9c52c71026d518bc4f": {
+  "latency_ms": 722.5,
+  "response": "{\n  \"answer\": \"12 trades were closed in December 2024.\",\n  \"insight\": \"December 2024 recorded 12 closed trades, reflecting the trading activity for that month. This number serves as a baseline for evaluating future monthly performance.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.43438139,
+   "completion_tokens": 209,
+   "completion_tokens_details": {
+    "reasoning_tokens": 123
+   },
+   "prompt_time": 0.007780107,
+   "prompt_tokens": 418,
+   "prompt_tokens_details": {
+    "cached_tokens": 256
+   },
+   "queue_time": 0.244827952,
+   "total_time": 0.442161497,
+   "total_tokens": 627
+  }
+ },
+ "f5ad4689852ad3fc24a3672c3d392a9a9f11595da6994e443824d5ea6d2eaaa5": {
+  "latency_ms": 1056.5,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT regime, COUNT(*) AS days FROM market_regime_daily GROUP BY regime\"\n}",
+  "usage": {
+   "completion_time": 0.269493021,
+   "completion_tokens": 128,
+   "completion_tokens_details": {
+    "reasoning_tokens": 84
+   },
+   "prompt_time": 0.109045524,
+   "prompt_tokens": 2380,
+   "queue_time": 0.380783518,
+   "total_time": 0.378538545,
+   "total_tokens": 2508
+  }
+ },
+ "f819d668f6905fecfc44510d833b66fc8180a1847f97779acd08ac6f112ef051": {
+  "latency_ms": 805.2,
+  "response": "{\"answerable\": true, \"reason\": \"\", \"sql\": \"SELECT ROUND(SUM(pnl), 2) AS total_pnl FROM trades WHERE status = 'closed'\"}",
+  "usage": {
+   "completion_time": 0.499868944,
+   "completion_tokens": 238,
+   "completion_tokens_details": {
+    "reasoning_tokens": 192
+   },
+   "prompt_time": 0.00600078,
+   "prompt_tokens": 2383,
+   "prompt_tokens_details": {
+    "cached_tokens": 2304
+   },
+   "queue_time": 0.244845132,
+   "total_time": 0.505869724,
+   "total_tokens": 2621
+  }
+ },
+ "f86ea11a15de02ff4d3f32d49331540814f5d18c61b5302da422d45cf3a23861": {
+  "latency_ms": 1094.7,
+  "response": "{\n  \"answer\": \"WFC\",\n  \"insight\": \"The symbol WFC had the highest trade count among all symbols in the dataset, indicating it is the most frequently traded security. This suggests strong interest or liquidity in WFC, which could be a focus for monitoring market activity.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.726807115,
+   "completion_tokens": 349,
+   "completion_tokens_details": {
+    "reasoning_tokens": 253
+   },
+   "prompt_time": 0.023875805,
+   "prompt_tokens": 444,
+   "queue_time": 0.244265201,
+   "total_time": 0.75068292,
+   "total_tokens": 793
+  }
+ },
+ "f8ae52e2f5b95eb15feb880240fee88c86c27e7942b85b8b6ba0e329c4a3a976": {
+  "latency_ms": 999.6,
+  "response": "{\n  \"answer\": \"The maximum drawdown of the backtest equity curve was 1.95%.\",\n  \"insight\": \"The strategy's worst peak\u2011to\u2011trough loss was only 1.95%, indicating a relatively low level of downside risk. This suggests the backtest maintained capital stability even during its most adverse period.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": null,\n    \"y\": null\n  }\n}",
+  "usage": {
+   "completion_time": 0.440374533,
+   "completion_tokens": 209,
+   "completion_tokens_details": {
+    "reasoning_tokens": 102
+   },
+   "prompt_time": 0.097927157,
+   "prompt_tokens": 429,
+   "queue_time": 0.385885758,
+   "total_time": 0.53830169,
+   "total_tokens": 638
+  }
+ },
+ "fb122ad7d7d89a60534dedd9b2025cfd774f578710a341cdcba09b7ea3f16ccd": {
+  "latency_ms": 916.0,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT ROUND(MAX(pnl), 2) AS max_profit FROM trades WHERE status = 'closed'\"\n}",
+  "usage": {
+   "completion_time": 0.30820632,
+   "completion_tokens": 149,
+   "completion_tokens_details": {
+    "reasoning_tokens": 101
+   },
+   "prompt_time": 0.14301971,
+   "prompt_tokens": 2380,
+   "queue_time": 0.303264147,
+   "total_time": 0.45122603,
+   "total_tokens": 2529
+  }
+ },
+ "fb2bbecb815267dfca36f298b84049e5a1e86aa58c9c5692d1ac34ac9a6ba0f6": {
+  "latency_ms": 965.9,
+  "response": "{\n  \"answerable\": true,\n  \"reason\": \"\",\n  \"sql\": \"SELECT COUNT(*) AS trades_opened_q1_2026 FROM trades WHERE entry_date >= '2026-01-01' AND entry_date <= '2026-03-31';\"\n}",
+  "usage": {
+   "completion_time": 0.430562093,
+   "completion_tokens": 208,
+   "completion_tokens_details": {
+    "reasoning_tokens": 141
+   },
+   "prompt_time": 0.114407804,
+   "prompt_tokens": 2383,
+   "queue_time": 0.330793955,
+   "total_time": 0.544969897,
+   "total_tokens": 2591
+  }
+ },
+ "fb9ae6f8cdc508b1d15a25b25a44fdddd88b8df2d3a44722958a4ada82cb0519": {
+  "latency_ms": 823.1,
+  "response": "{\n  \"answer\": \"Strategy MEAN_REVERSION: total P&L = 10651.1; Strategy MOMENTUM: total P&L = -395.93.\",\n  \"insight\": \"The MEAN_REVERSION strategy generated a strong positive profit of 10,651.1, while the MOMENTUM strategy resulted in a loss of -395.93. This suggests that MEAN_REVERSION is currently more profitable and may warrant further allocation of resources.\",\n  \"chart\": {\n    \"type\": \"bar\",\n    \"x\": \"strategy\",\n    \"y\": \"total_pnl\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.500795991,
+   "completion_tokens": 241,
+   "completion_tokens_details": {
+    "reasoning_tokens": 103
+   },
+   "prompt_time": 0.019336132,
+   "prompt_tokens": 461,
+   "queue_time": 0.244747976,
+   "total_time": 0.520132123,
+   "total_tokens": 702
+  }
+ },
+ "fc00d4ac2f90e0d33472c8397ab202505ecebcd2e946afed48719181ab92b8af": {
+  "latency_ms": 821.7,
+  "response": "{\n  \"answer\": \"We paid a total of $362.00 in trading costs.\",\n  \"insight\": \"The total trading costs amount to $362, representing the overall expense incurred from trades in the period covered. This figure can serve as a baseline for budgeting and assessing cost efficiency.\",\n  \"chart\": {\n    \"type\": \"none\",\n    \"x\": \"\",\n    \"y\": \"\"\n  }\n}",
+  "usage": {
+   "completion_time": 0.417103335,
+   "completion_tokens": 199,
+   "completion_tokens_details": {
+    "reasoning_tokens": 105
+   },
+   "prompt_time": 0.022474771,
+   "prompt_tokens": 420,
+   "queue_time": 0.299225651,
+   "total_time": 0.439578106,
+   "total_tokens": 619
+  }
+ }
+}

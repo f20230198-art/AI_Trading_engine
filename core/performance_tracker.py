@@ -78,6 +78,24 @@ class PerformanceTracker:
             cols = [desc[0] for desc in cursor.description]
             self._trades = [dict(zip(cols, row)) for row in rows]
 
+        # Load the equity curve too — without this the curve resets on every
+        # restart, which silently un-latches the daily drawdown rule mid-session.
+        async with aiosqlite.connect(self._db_path) as db:
+            cursor = await db.execute(
+                "SELECT timestamp, equity, cash, positions_value "
+                "FROM equity_snapshots ORDER BY id"
+            )
+            rows = await cursor.fetchall()
+            cols = [desc[0] for desc in cursor.description]
+            self._equity_curve = [dict(zip(cols, row)) for row in rows]
+
+        if self._equity_curve:
+            self._current_equity = float(self._equity_curve[-1]["equity"])
+            self._peak_equity = max(
+                self._peak_equity,
+                max(float(s["equity"]) for s in self._equity_curve),
+            )
+
         self._initialized = True
         logger.info(f"PerformanceTracker initialized with ${initial_equity:,.2f}")
 
@@ -259,6 +277,45 @@ class PerformanceTracker:
             max_dd = max(max_dd, dd)
         return round(max_dd * 100, 2)
 
+    def compute_daily_drawdown(self, now: Optional[datetime] = None) -> float:
+        """
+        Peak-to-current drawdown within the current UTC day, as a positive percent.
+
+        This is the number the 3% daily drawdown hard rule is written against.
+        compute_max_drawdown() spans the whole equity curve and only ever grows,
+        so it must not be used for a per-day limit.
+
+        The day's peak is seeded with the last snapshot before midnight (the day's
+        opening equity) so a loss is visible from the very first snapshot of the day.
+        Returns 0.0 when there is no snapshot for today.
+        """
+        now = now or datetime.utcnow()
+        today = now.date()
+
+        todays: List[float] = []
+        prior_equity: Optional[float] = None
+
+        for snapshot in self._equity_curve:
+            try:
+                ts = datetime.fromisoformat(snapshot["timestamp"])
+                equity = float(snapshot["equity"])
+            except (KeyError, TypeError, ValueError):
+                continue  # malformed snapshot — ignore rather than crash the risk path
+            if ts.date() == today:
+                todays.append(equity)
+            elif ts.date() < today:
+                prior_equity = equity  # curve is append-ordered, so this ends as yesterday's close
+
+        if not todays:
+            return 0.0
+
+        peak = max(todays + ([prior_equity] if prior_equity is not None else []))
+        current = todays[-1]
+        if peak <= 0:
+            return 0.0
+
+        return round(max(0.0, (peak - current) / peak) * 100, 2)
+
     def compute_agent_attribution(self) -> Dict[str, Dict]:
         """Per-agent performance attribution."""
         agent_stats = defaultdict(lambda: {
@@ -359,6 +416,7 @@ class PerformanceTracker:
             "unrealized_estimate": unrealized,
             "sharpe_ratio": self.compute_sharpe_ratio(),
             "max_drawdown": self.compute_max_drawdown(),
+            "daily_drawdown": self.compute_daily_drawdown(),
             "win_rate": self.compute_win_rate(),
             "active_positions": len(open_trades),
             "total_trades": len(self._trades),

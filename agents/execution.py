@@ -61,10 +61,28 @@ class ExecutionAgent(BaseAgent):
                 return {"agent": self.name, "executed": [], "failed": []}
 
             if not ALPACA_API_KEY:
-                raise RuntimeError(
-                    "ALPACA_API_KEY not set. Cannot place trades. "
-                    "The Execution Agent requires real Alpaca Paper Trading API access."
+                # Not an error condition. Everything upstream — signals, risk
+                # review, veto enforcement, sizing — has run and is observable;
+                # only order placement needs a broker. Report and skip rather
+                # than raising, so a keyless demo shows a clean cycle.
+                logger.info(
+                    f"No Alpaca credentials — {len(approved_trades)} approved "
+                    "trade(s) not placed. Set ALPACA_API_KEY to enable execution."
                 )
+                await self.update_status(
+                    "ADVISORY", f"{len(approved_trades)} trades pending broker credentials"
+                )
+                await shared_state.add_agent_message(
+                    self.name, "orchestrator", "EXECUTION_SKIPPED",
+                    f"{len(approved_trades)} trades ready but no broker configured",
+                )
+                return {
+                    "agent": self.name,
+                    "executed": [],
+                    "failed": [],
+                    "skipped": approved_trades,
+                    "reason": "no_broker_credentials",
+                }
 
             executed = []
             failed = []
@@ -125,8 +143,25 @@ class ExecutionAgent(BaseAgent):
         """Place a single order via Alpaca with retry logic."""
         symbol = trade["symbol"]
         action = trade["action"].lower()  # buy or sell
-        qty = trade.get("qty", 1)
         order_type = trade.get("entry_type", "market").lower()
+
+        # Never fall back to a nominal size. A trade that reaches here without a
+        # deterministic qty was not sized against portfolio equity, so it cannot
+        # be shown to respect max_position_pct — refuse it rather than guess.
+        try:
+            qty = int(trade.get("qty") or 0)
+        except (TypeError, ValueError):
+            qty = 0
+        if qty <= 0:
+            logger.error(
+                f"Refusing to place {action.upper()} {symbol}: qty={trade.get('qty')!r} "
+                "— trade was not sized deterministically."
+            )
+            return {
+                "success": False,
+                "symbol": symbol,
+                "error": "Invalid qty — trade not sized",
+            }
 
         # Build order payload
         order = {

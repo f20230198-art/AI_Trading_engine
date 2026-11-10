@@ -69,6 +69,34 @@ class AgentMemoryStore:
             """)
             await db.commit()
 
+    @staticmethod
+    def _sanitize_metadata(meta: Dict) -> Dict:
+        """
+        Coerce metadata into what ChromaDB accepts.
+
+        ChromaDB rejects empty lists outright ("Expected metadata list value to
+        be non-empty") and only supports scalars and non-empty homogeneous lists.
+        Agents routinely produce empty lists — an Orchestrator cycle that
+        approves no trades yields approved_symbols=[] — so without this every
+        such cycle would fail to record a memory.
+
+        Only str/int/float/bool survive. None is dropped entirely (ChromaDB
+        rejects it), lists are joined into a comma-separated string with empty
+        lists becoming "none", and anything else falls back to str().
+        """
+        clean: Dict = {}
+        for key, value in (meta or {}).items():
+            if value is None:
+                continue  # ChromaDB will not accept a null metadata value
+            if isinstance(value, bool) or isinstance(value, (str, int, float)):
+                clean[key] = value
+            elif isinstance(value, (list, tuple, set)):
+                items = [str(v) for v in value if v is not None]
+                clean[key] = ", ".join(items) if items else "none"
+            else:
+                clean[key] = str(value)
+        return clean
+
     def _get_collection(self, agent_name: str):
         """Get or create a ChromaDB collection for an agent."""
         if agent_name not in self._collections:
@@ -116,12 +144,17 @@ class AgentMemoryStore:
         if self._use_chroma:
             collection = self._get_collection(agent_name)
             # ChromaDB will use its default embedding function (sentence-transformers)
-            collection.add(
-                documents=[doc_text],
-                metadatas=[meta],
-                ids=[memory_id],
-            )
-            logger.debug(f"Stored memory for {agent_name}: {memory_id}")
+            try:
+                collection.add(
+                    documents=[doc_text],
+                    metadatas=[self._sanitize_metadata(meta)],
+                    ids=[memory_id],
+                )
+                logger.debug(f"Stored memory for {agent_name}: {memory_id}")
+            except Exception as e:
+                # Memory is an enhancement, not a requirement. An agent that
+                # cannot write a memory must still complete its cycle.
+                logger.warning(f"Memory write failed for {agent_name}: {e}")
         else:
             await self._sqlite_store(memory_id, agent_name, doc_text, meta, timestamp)
 
@@ -141,23 +174,35 @@ class AgentMemoryStore:
             await self.initialize()
 
         if self._use_chroma:
-            collection = self._get_collection(agent_name)
-            if collection.count() == 0:
+            # Recall is an enhancement, never a requirement. ChromaDB can raise
+            # transient errors such as "Nothing found on disk" when a collection
+            # has been written but its HNSW segment is not yet flushed, and a
+            # failed lookup of past context must not abort a trading cycle.
+            try:
+                collection = self._get_collection(agent_name)
+                count = collection.count()
+                if count == 0:
+                    return []
+
+                results = collection.query(
+                    query_texts=[current_situation],
+                    n_results=min(top_k, count),
+                )
+
+                memories = []
+                documents = (results.get("documents") or [[]])[0]
+                metadatas = (results.get("metadatas") or [[]])[0]
+                distances = (results.get("distances") or [[]])[0]
+                for i, document in enumerate(documents):
+                    memories.append({
+                        "content": document,
+                        "metadata": metadatas[i] if i < len(metadatas) else {},
+                        "distance": distances[i] if i < len(distances) else None,
+                    })
+                return memories
+            except Exception as e:
+                logger.warning(f"Memory recall failed for {agent_name}: {e}")
                 return []
-
-            results = collection.query(
-                query_texts=[current_situation],
-                n_results=min(top_k, collection.count()),
-            )
-
-            memories = []
-            for i in range(len(results["documents"][0])):
-                memories.append({
-                    "content": results["documents"][0][i],
-                    "metadata": results["metadatas"][0][i],
-                    "distance": results["distances"][0][i] if results.get("distances") else None,
-                })
-            return memories
         else:
             return await self._sqlite_recall(agent_name, current_situation, top_k)
 
